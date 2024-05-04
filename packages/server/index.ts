@@ -6,6 +6,8 @@ import {
   handleCors,
 } from "h3";
 import { mediasoupServerPromise, peerList } from "./mediasoup/mediasoupServer";
+import type { BennyWebsocketEnvelope } from "types";
+import type { AppData } from "mediasoup/node/lib/types";
 
 export const app = createApp({});
 const h3Router = createRouter();
@@ -59,8 +61,29 @@ h3Router.get(
 
     message(peer, message) {
       console.log("[ws] message", peer, message);
-      if (message.text().includes("ping")) {
+      if (message.text() === "ping") {
         peer.send("pong");
+      }
+
+      const envelope = JSON.parse(message.text()) as BennyWebsocketEnvelope;
+
+      if (envelope.command.startsWith("getWebRtcTransportOptions")) {
+        // 2. When client requests WebRtcTransportOptions: getWebRtcTransportOptions
+        const webRtcTransport = peerList.get(peer.id);
+
+        if (!webRtcTransport) {
+          peer.send("No WebRtcTransport found for this websocket connection!");
+          return;
+        }
+
+        peer.send(
+          JSON.stringify(
+            {
+              command: "WebRtcTransportOptions",
+              payload: webRtcTransport.appData,
+            } satisfies AppData,
+          ),
+        );
       }
     },
 
