@@ -1,11 +1,14 @@
 {
-  "name": "mediasoup-sample-2024-h3-solidjs",
-  "module": "index.ts",
-  "type": "module",
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  }
+	"name": "mediasoup-sample-2024-h3-solidjs",
+	"type": "module",
+	"private": true,
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"workspaces": [
+		"packages/*"
+	]
 }
