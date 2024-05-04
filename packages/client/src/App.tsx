@@ -4,6 +4,7 @@ import {WSMessage, createWS, createWSState} from '@solid-primitives/websocket';
 import {createStore} from 'solid-js/store';
 import {BennyWebsocketEnvelope} from 'types';
 import {ProducerOptions, TransportOptions} from 'mediasoup-client/lib/types';
+import {AudioDeviceSelector} from './features/send-audio/AudioDeviceSelector';
 
 /**
  *
@@ -86,17 +87,23 @@ const App: Component = () => {
 		return sendTransport;
 	});
 
+	// Step 6: Create a media track
+	const [stream, setStream] = createSignal<MediaStream | undefined>();
+
+	// Step 7: Create a producer
 	const [producer] = createResource(sendTransport, async () => {
 		const mySendTransport = sendTransport();
-		if (!mySendTransport) {
-			console.error('No sendTransport available');
+		const myStream = stream();
+
+		if (!mySendTransport || !myStream) {
+			console.error('No sendTransport or no myStream available');
 			return;
 		}
 
 		// Options for the producer are optional! :)
 		const options = {
 			// TODO: get a MediaStreamTrack from a device, preferrably a mic
-			// track: MediaStreamTrack;
+			track: myStream.getAudioTracks()[0],
 			// encodings: [{ssrc: 111111}],
 			// codecOptions: {},
 			// codec: {kind: 'audio', mimeType: 'audio/opus', clockRate: 48000, channels: 2},
@@ -104,7 +111,7 @@ const App: Component = () => {
 
 		const producer = await mySendTransport.produce(options);
 
-		console.log('Step 6: producer', producer);
+		console.log('Step 7: producer', producer);
 		return producer;
 	});
 
@@ -113,12 +120,14 @@ const App: Component = () => {
 	});
 
 	return (
-		<div>
+		<div style="display: flex; flex-flow: column nowrap; gap: 24px; padding: 16px">
 			<h1>SolidJS Test App for Mediasoup</h1>
 
 			<p> WS Connection: {states[wsState()]}</p>
 
 			<button onClick={() => ws.send('ping')}>Ping WS</button>
+
+			<AudioDeviceSelector onDeviceSelected={stream => setStream(stream)} />
 
 			{/* Debug Step 2 */}
 			<ul>
