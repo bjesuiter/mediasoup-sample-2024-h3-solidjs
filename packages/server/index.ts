@@ -1,31 +1,36 @@
-import { createApp, defineEventHandler, defineWebSocketHandler } from "h3";
+import {
+  createApp,
+  createRouter,
+  defineEventHandler,
+  defineWebSocketHandler,
+  handleCors,
+} from "h3";
 import { mediasoupServerPromise } from "./mediasoup/mediasoupServer";
 
 export const app = createApp({});
+const h3Router = createRouter();
 
 // open: http://localhost:3000/
-app.use(
-  "/", // Root path
+h3Router.get(
+  "/",
   defineEventHandler(() =>
     fetch(
       "https://raw.githubusercontent.com/unjs/crossws/main/examples/h3/public/index.html",
     ).then((r) => r.text())
   ),
-  {
-    match: (url) => url === "/",
-  },
 );
 
 // open: http://localhost:3000/getServerRtpCapabilities
-app.use(
+h3Router.get(
   "/getServerRtpCapabilities",
-  defineEventHandler(async () => {
+  defineEventHandler(async (event) => {
+    handleCors(event, {});
     const { router } = await mediasoupServerPromise;
     return router.rtpCapabilities;
   }),
 );
 
-app.use(
+h3Router.get(
   "/_ws",
   defineWebSocketHandler({
     async open(peer) {
@@ -52,3 +57,5 @@ app.use(
     },
   }),
 );
+
+app.use(h3Router);
