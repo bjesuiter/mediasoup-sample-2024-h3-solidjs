@@ -3,7 +3,7 @@ import * as mediasoupClient from 'mediasoup-client';
 import {WSMessage, createWS, createWSState} from '@solid-primitives/websocket';
 import {createStore} from 'solid-js/store';
 import {BennyWebsocketEnvelope} from 'types';
-import {TransportOptions} from 'mediasoup-client/lib/types';
+import {ProducerOptions, TransportOptions} from 'mediasoup-client/lib/types';
 
 /**
  *
@@ -36,6 +36,7 @@ const App: Component = () => {
 		const msg = JSON.parse(ev.data) as BennyWebsocketEnvelope;
 
 		if (msg.command === 'WebRtcTransportOptions') {
+			console.log('Step 4: WebRtcTransportOptions', msg.payload);
 			setWebRtcTransportOptions(msg.payload);
 		}
 
@@ -51,7 +52,7 @@ const App: Component = () => {
 	const [serverRtpCapabilities] = createResource(async () => {
 		const response = await fetch('http://localhost:3000/getServerRtpCapabilities');
 		const responseObj = await response.json();
-		console.log('serverRtpCapabilities', responseObj);
+		console.log('Step 1: serverRtpCapabilities', responseObj);
 		return responseObj;
 	});
 	const debugServerRtpCapabilities = () => JSON.stringify(serverRtpCapabilities(), null, 2);
@@ -64,7 +65,7 @@ const App: Component = () => {
 		//Step 3: Call device.load with serverRtpCapabilities
 		await device.load({routerRtpCapabilities: serverRtpCapabilities()});
 
-		console.log('device', device);
+		console.log('Step 2 & 3: device', device);
 
 		return device;
 	});
@@ -81,8 +82,34 @@ const App: Component = () => {
 		}
 
 		const sendTransport = myDevice.createSendTransport(myOptions);
-		console.log('sendTransport', sendTransport);
+		console.log('Step 5: sendTransport', sendTransport);
 		return sendTransport;
+	});
+
+	const [producer] = createResource(sendTransport, async () => {
+		const mySendTransport = sendTransport();
+		if (!mySendTransport) {
+			console.error('No sendTransport available');
+			return;
+		}
+
+		// Options for the producer are optional! :)
+		const options = {
+			// TODO: get a MediaStreamTrack from a device, preferrably a mic
+			// track: MediaStreamTrack;
+			// encodings: [{ssrc: 111111}],
+			// codecOptions: {},
+			// codec: {kind: 'audio', mimeType: 'audio/opus', clockRate: 48000, channels: 2},
+		} satisfies ProducerOptions;
+
+		const producer = await mySendTransport.produce(options);
+
+		console.log('Step 6: producer', producer);
+		return producer;
+	});
+
+	createEffect(() => {
+		producer();
 	});
 
 	return (
