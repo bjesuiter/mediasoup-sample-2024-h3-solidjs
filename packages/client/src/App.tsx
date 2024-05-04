@@ -1,7 +1,9 @@
-import {For, createEffect, createResource, on, type Component} from 'solid-js';
+import {For, createEffect, createResource, createSignal, on, type Component} from 'solid-js';
 import * as mediasoupClient from 'mediasoup-client';
 import {WSMessage, createWS, createWSState} from '@solid-primitives/websocket';
 import {createStore} from 'solid-js/store';
+import {BennyWebsocketEnvelope} from 'types';
+import {TransportOptions} from 'mediasoup-client/lib/types';
 
 /**
  *
@@ -19,7 +21,28 @@ const App: Component = () => {
 	const wsState = createWSState(ws);
 	const states = ['Connecting', 'Connected', 'Disconnecting', 'Disconnected'];
 	const [wsMessages, setWsMessages] = createStore<WSMessage[]>([]);
-	ws.addEventListener('message', ev => setWsMessages(wsMessages.length, ev.data));
+
+	const [webRtcTransportOptions, setWebRtcTransportOptions] = createSignal<
+		TransportOptions | undefined
+	>();
+
+	// ws message listener
+	ws.addEventListener('message', ev => {
+		if (ev.data === 'pong') {
+			setWsMessages(wsMessages.length, ev.data);
+			return;
+		}
+
+		const msg = JSON.parse(ev.data) as BennyWebsocketEnvelope;
+
+		if (msg.command === 'WebRtcTransportOptions') {
+			setWebRtcTransportOptions(msg.payload);
+		}
+
+		if (msg.command === 'Error') {
+			console.error('Error from server:', msg.payload);
+		}
+	});
 
 	// ws.send('it works');
 	// createEffect(on(ws., msg => console.log(msg), {defer: true}));
@@ -27,7 +50,7 @@ const App: Component = () => {
 	// Step 1: Load ServerRtpCapabilities
 	const [serverRtpCapabilities] = createResource(async () => {
 		const response = await fetch('http://localhost:3000/getServerRtpCapabilities');
-		const responseObj = response.json();
+		const responseObj = await response.json();
 		console.log('serverRtpCapabilities', responseObj);
 		return responseObj;
 	});
@@ -44,6 +67,22 @@ const App: Component = () => {
 		console.log('device', device);
 
 		return device;
+	});
+
+	// Step 4: Request & Receive webRtcTransportOptions (in Websocket handler at the top)
+	ws.send(JSON.stringify({command: 'getWebRtcTransportOptions', payload: {}}));
+
+	// Step 5: Create a sendTransport
+	const [sendTransport] = createResource(device, async () => {
+		const myDevice = device();
+		const myOptions = webRtcTransportOptions();
+		if (!myDevice || !myOptions) {
+			return;
+		}
+
+		const sendTransport = myDevice.createSendTransport(myOptions);
+		console.log('sendTransport', sendTransport);
+		return sendTransport;
 	});
 
 	return (

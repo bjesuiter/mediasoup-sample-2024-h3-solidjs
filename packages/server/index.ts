@@ -59,7 +59,7 @@ h3Router.get(
       peerList.set(peer.id, webRtcTransport);
     },
 
-    message(peer, message) {
+    async message(peer, message) {
       console.log("[ws] message", peer, message);
       if (message.text() === "ping") {
         peer.send("pong");
@@ -67,21 +67,32 @@ h3Router.get(
 
       const envelope = JSON.parse(message.text()) as BennyWebsocketEnvelope;
 
+      // Respond to getWebRtcTransportOptions()
       if (envelope.command.startsWith("getWebRtcTransportOptions")) {
         // 2. When client requests WebRtcTransportOptions: getWebRtcTransportOptions
         const webRtcTransport = peerList.get(peer.id);
 
         if (!webRtcTransport) {
-          peer.send("No WebRtcTransport found for this websocket connection!");
+          peer.send({
+            command: "error",
+            payload: "No WebRtcTransport found for this websocket connection!",
+          });
           return;
         }
+
+        const transportOptions = {
+          id: webRtcTransport.id,
+          iceParameters: webRtcTransport.iceParameters,
+          iceCandidates: webRtcTransport.iceCandidates,
+          dtlsParameters: webRtcTransport.dtlsParameters,
+        };
 
         peer.send(
           JSON.stringify(
             {
               command: "WebRtcTransportOptions",
-              payload: webRtcTransport.appData,
-            } satisfies AppData,
+              payload: transportOptions,
+            } satisfies BennyWebsocketEnvelope,
           ),
         );
       }
