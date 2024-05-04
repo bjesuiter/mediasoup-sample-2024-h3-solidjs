@@ -1,5 +1,7 @@
-import {createResource, type Component} from 'solid-js';
+import {For, createEffect, createResource, on, type Component} from 'solid-js';
 import * as mediasoupClient from 'mediasoup-client';
+import {WSMessage, createWS, createWSState} from '@solid-primitives/websocket';
+import {createStore} from 'solid-js/store';
 
 /**
  *
@@ -12,10 +14,22 @@ import * as mediasoupClient from 'mediasoup-client';
  */
 
 const App: Component = () => {
+	// Local SolidJS Preparation:
+	const ws = createWS('ws://localhost:3000/_ws');
+	const wsState = createWSState(ws);
+	const states = ['Connecting', 'Connected', 'Disconnecting', 'Disconnected'];
+	const [wsMessages, setWsMessages] = createStore<WSMessage[]>([]);
+	ws.addEventListener('message', ev => setWsMessages(wsMessages.length, ev.data));
+
+	// ws.send('it works');
+	// createEffect(on(ws., msg => console.log(msg), {defer: true}));
+
 	// Step 1: Load ServerRtpCapabilities
 	const [serverRtpCapabilities] = createResource(async () => {
 		const response = await fetch('http://localhost:3000/getServerRtpCapabilities');
-		return response.json();
+		const responseObj = response.json();
+		console.log('serverRtpCapabilities', responseObj);
+		return responseObj;
 	});
 
 	const [device] = createResource(serverRtpCapabilities, async () => {
@@ -36,7 +50,17 @@ const App: Component = () => {
 		<div>
 			<h1>SolidJS Test App for Mediasoup</h1>
 
-			<pre>{debugServerRtpCapabilities()}</pre>
+			<p> WS Connection: {states[wsState()]}</p>
+
+			<button onClick={() => ws.send('ping')}>Ping WS</button>
+
+			{/* Debug Step 2 */}
+			<ul>
+				<For each={wsMessages}>{message => <li>{message.toString()}</li>}</For>
+			</ul>
+
+			{/* Debug Step 1 */}
+			{/* <pre>{debugServerRtpCapabilities()}</pre> */}
 		</div>
 	);
 };
