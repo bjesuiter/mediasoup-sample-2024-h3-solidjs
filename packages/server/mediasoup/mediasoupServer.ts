@@ -6,6 +6,12 @@ export const mediasoupServerPromise: Promise<{
   worker: mediasoup.types.Worker<mediasoup.types.AppData>;
 }> = runMediasoupServer();
 
+// Map of websocket peers with their webrtc transports
+export const peerList = new Map<
+  string,
+  mediasoup.types.WebRtcTransport<mediasoup.types.AppData>
+>();
+
 async function runMediasoupServer() {
   const mediaCodecs = [
     {

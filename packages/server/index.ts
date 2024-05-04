@@ -5,7 +5,7 @@ import {
   defineWebSocketHandler,
   handleCors,
 } from "h3";
-import { mediasoupServerPromise } from "./mediasoup/mediasoupServer";
+import { mediasoupServerPromise, peerList } from "./mediasoup/mediasoupServer";
 
 export const app = createApp({});
 const h3Router = createRouter();
@@ -35,10 +35,26 @@ h3Router.get(
   defineWebSocketHandler({
     async open(peer) {
       console.log("[ws] open", peer);
-      // 1. When client connects:
+      // 1. When client connects: createWebRtcTransport
       const soupServer = await mediasoupServerPromise;
+      const webRtcTransport = await soupServer.router.createWebRtcTransport(
+        {
+          listenInfos: [
+            {
+              protocol: "udp",
+              ip: "0.0.0.0",
+              // = public address, if needed
+              // announcedAddress: "88.12.10.41",
+            },
+          ],
+          // enableUdp: true,
+          // enableTcp: true,
+          // preferUdp: true,
+        },
+      );
 
-      // const router = soupServer.router.createD;
+      // store the new webRtcTransport in the peerList, to be able to access it later
+      peerList.set(peer.id, webRtcTransport);
     },
 
     message(peer, message) {
