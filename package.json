@@ -1,0 +1,11 @@
+{
+  "name": "mediasoup-sample-2024-h3-solidjs",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
