@@ -24,7 +24,7 @@ h3Router.get(
 h3Router.get(
   "/getServerRtpCapabilities",
   defineEventHandler(async (event) => {
-    handleCors(event, {});
+    handleCors(event, { origin: "*" });
     const { router } = await mediasoupServerPromise;
     return router.rtpCapabilities;
   }),
