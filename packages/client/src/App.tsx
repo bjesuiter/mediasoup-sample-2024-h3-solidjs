@@ -31,7 +31,9 @@ const App: Component = () => {
 		console.log('serverRtpCapabilities', responseObj);
 		return responseObj;
 	});
+	const debugServerRtpCapabilities = () => JSON.stringify(serverRtpCapabilities(), null, 2);
 
+	// Step 2 & 3
 	const [device] = createResource(serverRtpCapabilities, async () => {
 		// Step 2: Create a device
 		const device = new mediasoupClient.Device();
@@ -43,8 +45,6 @@ const App: Component = () => {
 
 		return device;
 	});
-
-	const debugServerRtpCapabilities = () => JSON.stringify(serverRtpCapabilities(), null, 2);
 
 	return (
 		<div>
