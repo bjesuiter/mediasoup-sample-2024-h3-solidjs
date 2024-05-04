@@ -9,6 +9,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "mediasoup": "^3.14.5"
+    "mediasoup": "^3.14.5",
+    "mediasoup-client": "^3.7.7"
   }
 }
