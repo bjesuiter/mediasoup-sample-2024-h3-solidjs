@@ -100,10 +100,12 @@ const App: Component = () => {
 			return;
 		}
 
+		const audioTrack = myStream.getAudioTracks()[0];
+		console.log('Step 6: audioTrack', audioTrack);
 		// Options for the producer are optional! :)
 		const options = {
 			// TODO: get a MediaStreamTrack from a device, preferrably a mic
-			track: myStream.getAudioTracks()[0],
+			track: audioTrack,
 			// encodings: [{ssrc: 111111}],
 			// codecOptions: {},
 			// codec: {kind: 'audio', mimeType: 'audio/opus', clockRate: 48000, channels: 2},
