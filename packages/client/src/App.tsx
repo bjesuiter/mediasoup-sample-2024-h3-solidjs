@@ -93,6 +93,50 @@ const App: Component = () => {
 			if (!device || !options) return;
 
 			const sendTransport = device.createSendTransport(options);
+
+			// Connect the transport lazily, when the first producer wants to send data
+			sendTransport.on('connect', async ({dtlsParameters}, callback, errback) => {
+				// Signal local DTLS parameters to the server side transport.
+				try {
+					const wsEnvelope = {
+						command: 'connectWebRtcTransport',
+						payload: {dtlsParameters, transportId: sendTransport.id},
+					} satisfies BennyWebsocketEnvelope;
+
+					ws.send(JSON.stringify(wsEnvelope));
+				} catch (error: unknown) {
+					errback(
+						new Error(
+							`Error while sending DTLS parameters: ${JSON.stringify(error, undefined, '\t')}`
+						)
+					);
+				}
+			});
+
+			sendTransport.on('produce', async ({kind, rtpParameters, appData}, callback, errback) => {
+				// Signal parameters to the server side transport and retrieve the id of
+				// the server side new producer.
+				try {
+					const wsEnvelope = {
+						command: 'newProducer',
+						payload: {
+							transportId: sendTransport.id,
+							kind,
+							rtpParameters,
+							appData,
+						},
+					} satisfies BennyWebsocketEnvelope;
+
+					ws.send(JSON.stringify(wsEnvelope));
+				} catch (error: unknown) {
+					errback(
+						new Error(
+							`Error while sending DTLS parameters: ${JSON.stringify(error, undefined, '\t')}`
+						)
+					);
+				}
+			});
+
 			console.log('Step 5: sendTransport', sendTransport);
 			return sendTransport;
 		}

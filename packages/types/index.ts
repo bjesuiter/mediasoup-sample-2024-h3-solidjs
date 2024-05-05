@@ -1,4 +1,10 @@
-import type { TransportOptions } from "mediasoup-client/lib/types";
+import type {
+  AppData,
+  DtlsParameters,
+  MediaKind,
+  RtpParameters,
+  TransportOptions,
+} from "mediasoup-client/lib/types";
 
 export type BennyWebsocketEnvelope = {
   command: "WebRtcTransportOptions";
@@ -9,4 +15,18 @@ export type BennyWebsocketEnvelope = {
 } | {
   command: "Error";
   payload: string;
+} | {
+  command: "connectWebRtcTransport";
+  payload: {
+    transportId: string;
+    dtlsParameters: DtlsParameters;
+  };
+} | {
+  command: "newProducer";
+  payload: {
+    transportId: string;
+    kind: MediaKind;
+    rtpParameters: RtpParameters;
+    appData: AppData;
+  };
 };
