@@ -1,6 +1,7 @@
 /* @refresh reload */
 import {render} from 'solid-js/web';
 import {QueryClient, QueryClientProvider} from '@tanstack/solid-query';
+import {SolidQueryDevtools} from '@tanstack/solid-query-devtools';
 
 import './index.css';
 import App from './App';
@@ -18,6 +19,7 @@ render(
 	() => (
 		<QueryClientProvider client={queryClient}>
 			<App />
+			<SolidQueryDevtools initialIsOpen={true} />
 			{/* <Router>
 					<Routes>
 						<Route path="/" component={App} />

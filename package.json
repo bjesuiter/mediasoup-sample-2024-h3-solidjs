@@ -1,14 +1,17 @@
 {
-	"name": "mediasoup-sample-2024-h3-solidjs",
-	"type": "module",
-	"private": true,
-	"devDependencies": {
-		"@types/bun": "latest"
-	},
-	"peerDependencies": {
-		"typescript": "^5.0.0"
-	},
-	"workspaces": [
-		"packages/*"
-	]
+  "name": "mediasoup-sample-2024-h3-solidjs",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "@tanstack/solid-query-devtools": "^5.34.1"
+  }
 }
