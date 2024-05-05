@@ -84,47 +84,57 @@ const App: Component = () => {
 	ws.send(JSON.stringify({command: 'getWebRtcTransportOptions', payload: {}}));
 
 	// Step 5: Create a sendTransport
-	const [sendTransport] = createResource(device, async () => {
-		const myDevice = device();
-		const myOptions = webRtcTransportOptions();
-		if (!myDevice || !myOptions) {
-			return;
-		}
+	const [sendTransport] = createResource(
+		() => ({
+			device: device(),
+			options: webRtcTransportOptions(),
+		}),
+		async ({device, options}) => {
+			if (!device || !options) return;
 
-		const sendTransport = myDevice.createSendTransport(myOptions);
-		console.log('Step 5: sendTransport', sendTransport);
-		return sendTransport;
-	});
+			const sendTransport = device.createSendTransport(options);
+			console.log('Step 5: sendTransport', sendTransport);
+			return sendTransport;
+		}
+	);
 
 	// Step 6: Create a media track
 	const [stream, setStream] = createSignal<MediaStream | undefined>();
 
 	// Step 7: Create a producer
-	const [producer] = createResource(sendTransport, async () => {
-		const mySendTransport = sendTransport();
-		const myStream = stream();
+	const [producer] = createResource(
+		() => ({
+			sendTransport: sendTransport(),
+			stream: stream(),
+		}),
+		async ({sendTransport, stream}) => {
+			if (!sendTransport) {
+				// console.error('Step 6: createProducer: No sendTransport available');
+				return;
+			}
 
-		if (!mySendTransport || !myStream) {
-			console.error('No sendTransport or no myStream available');
-			return;
+			if (!stream) {
+				// console.error('Step 6: createProducer: No stream available');
+				return;
+			}
+
+			const audioTrack = stream.getAudioTracks()[0];
+			console.log('Step 6: audioTrack', audioTrack);
+			// Options for the producer are optional! :)
+			const options = {
+				// TODO: get a MediaStreamTrack from a device, preferrably a mic
+				track: audioTrack,
+				// encodings: [{ssrc: 111111}],
+				// codecOptions: {},
+				// codec: {kind: 'audio', mimeType: 'audio/opus', clockRate: 48000, channels: 2},
+			} satisfies ProducerOptions;
+
+			const producer = await sendTransport.produce(options);
+
+			console.log('Step 7: producer', producer);
+			return producer;
 		}
-
-		const audioTrack = myStream.getAudioTracks()[0];
-		console.log('Step 6: audioTrack', audioTrack);
-		// Options for the producer are optional! :)
-		const options = {
-			// TODO: get a MediaStreamTrack from a device, preferrably a mic
-			track: audioTrack,
-			// encodings: [{ssrc: 111111}],
-			// codecOptions: {},
-			// codec: {kind: 'audio', mimeType: 'audio/opus', clockRate: 48000, channels: 2},
-		} satisfies ProducerOptions;
-
-		const producer = await mySendTransport.produce(options);
-
-		console.log('Step 7: producer', producer);
-		return producer;
-	});
+	);
 
 	createEffect(() => {
 		producer();
