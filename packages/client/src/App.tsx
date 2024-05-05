@@ -109,12 +109,12 @@ const App: Component = () => {
 		}),
 		async ({sendTransport, stream}) => {
 			if (!sendTransport) {
-				// console.error('Step 6: createProducer: No sendTransport available');
+				console.error('Step 6: createProducer: No sendTransport available');
 				return;
 			}
 
 			if (!stream) {
-				// console.error('Step 6: createProducer: No stream available');
+				console.error('Step 6: createProducer: No stream available');
 				return;
 			}
 
@@ -144,7 +144,13 @@ const App: Component = () => {
 		<div style="display: flex; flex-flow: column nowrap; gap: 24px; padding: 16px">
 			<h1>SolidJS Test App for Mediasoup</h1>
 
-			<p> WS Connection: {states[wsState()]}</p>
+			<fieldset>
+				<legend>Infos</legend>
+				<div style="display: flex; flex-flow: column nowrap; gap: 24px; padding: 16px">
+					<span>WS Connection: {states[wsState()]}</span>
+					<span>Stream: {stream()?.getAudioTracks()[0].label}</span>
+				</div>
+			</fieldset>
 
 			<button onClick={() => ws.send('ping')}>Ping WS</button>
 
