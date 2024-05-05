@@ -1,7 +1,8 @@
-import {createQuery} from '@tanstack/solid-query';
-import {For, Suspense, createSignal} from 'solid-js';
+import {createQuery, QueryClient, useQueryClient} from '@tanstack/solid-query';
+import {For, Suspense, createEffect, createSignal} from 'solid-js';
 
 export function AudioDeviceSelector(props: {onDeviceSelected?: (stream?: MediaStream) => any}) {
+	const queryClient = useQueryClient();
 	const [selectedDeviceId, setSelectedDeviceId] = createSignal<string | undefined>('default');
 
 	const localAudioDevices = createQuery(() => ({
@@ -27,13 +28,19 @@ export function AudioDeviceSelector(props: {onDeviceSelected?: (stream?: MediaSt
 
 			const userAudioMedia = await navigator.mediaDevices.getUserMedia(constraints);
 
-			if (props.onDeviceSelected) {
-				props.onDeviceSelected(selectedAudioStream.data);
-			}
-
 			return userAudioMedia;
 		},
 	}));
+
+	createEffect(() => {
+		const selectedStream = selectedAudioStream.data;
+
+		if (props.onDeviceSelected) {
+			props.onDeviceSelected(selectedStream);
+		}
+	});
+
+	// queryClient.prefetchQuery({queryKey: ['selectedAudioStream']});
 
 	return (
 		<>
