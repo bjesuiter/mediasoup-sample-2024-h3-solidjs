@@ -63,6 +63,7 @@ h3Router.get(
       console.log("[ws] message", peer, message);
       if (message.text() === "ping") {
         peer.send("pong");
+        return;
       }
 
       const envelope = JSON.parse(message.text()) as BennyWebsocketEnvelope;
