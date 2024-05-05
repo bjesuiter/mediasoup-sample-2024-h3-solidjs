@@ -5,6 +5,7 @@ import {createStore} from 'solid-js/store';
 import {BennyWebsocketEnvelope} from 'types';
 import {ProducerOptions, TransportOptions} from 'mediasoup-client/lib/types';
 import {AudioDeviceSelector} from './features/send-audio/AudioDeviceSelector';
+import {server} from 'typescript';
 
 /**
  *
@@ -60,17 +61,24 @@ const App: Component = () => {
 	const debugServerRtpCapabilities = () => JSON.stringify(serverRtpCapabilities(), null, 2);
 
 	// Step 2 & 3
-	const [device] = createResource(serverRtpCapabilities, async () => {
-		// Step 2: Create a device
-		const device = new mediasoupClient.Device();
+	const [device] = createResource(
+		() => ({
+			serverRtpCaps: serverRtpCapabilities(),
+		}),
+		async ({serverRtpCaps}) => {
+			if (!serverRtpCaps) return;
 
-		//Step 3: Call device.load with serverRtpCapabilities
-		await device.load({routerRtpCapabilities: serverRtpCapabilities()});
+			// Step 2: Create a device
+			const device = new mediasoupClient.Device();
 
-		console.log('Step 2 & 3: device', device);
+			//Step 3: Call device.load with serverRtpCapabilities
+			await device.load({routerRtpCapabilities: serverRtpCaps});
 
-		return device;
-	});
+			console.log('Step 2 & 3: device', device);
+
+			return device;
+		}
+	);
 
 	// Step 4: Request & Receive webRtcTransportOptions (in Websocket handler at the top)
 	ws.send(JSON.stringify({command: 'getWebRtcTransportOptions', payload: {}}));
