@@ -7,7 +7,7 @@ import {
 } from "h3";
 import { mediasoupServerPromise, peerList } from "./mediasoup/mediasoupServer";
 import type { BennyWebsocketEnvelope } from "types";
-import type { AppData } from "mediasoup/node/lib/types";
+import type { TransportOptions } from "mediasoup-client/lib/types";
 
 export const app = createApp({});
 const h3Router = createRouter();
@@ -96,6 +96,21 @@ h3Router.get(
             } satisfies BennyWebsocketEnvelope,
           ),
         );
+      }
+
+      if (envelope.command.startsWith("connectWebRtcTransport")) {
+        const webRtcTransport = peerList.get(peer.id);
+        const { dtlsParameters } = envelope.payload as TransportOptions;
+
+        if (!webRtcTransport) {
+          peer.send({
+            command: "error",
+            payload: "No WebRtcTransport found for this websocket connection!",
+          });
+          return;
+        }
+
+        await webRtcTransport.connect({ dtlsParameters });
       }
     },
 

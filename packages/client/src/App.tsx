@@ -104,6 +104,9 @@ const App: Component = () => {
 					} satisfies BennyWebsocketEnvelope;
 
 					ws.send(JSON.stringify(wsEnvelope));
+
+					// TODO: only call callback when server received the message
+					callback();
 				} catch (error: unknown) {
 					errback(
 						new Error(
