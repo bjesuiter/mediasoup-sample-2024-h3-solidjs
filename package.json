@@ -12,6 +12,5 @@
     "packages/*"
   ],
   "dependencies": {
-    "@tanstack/solid-query-devtools": "^5.34.1"
   }
 }

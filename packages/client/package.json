@@ -16,8 +16,10 @@
 		"vite-plugin-solid": "^2.10.2"
 	},
 	"dependencies": {
+		"@solidjs/router": "^0.13.3",
 		"@solid-primitives/websocket": "^1.2.2",
 		"@tanstack/solid-query": "^5.34.1",
+		"@tanstack/solid-query-devtools": "^5.34.1",
 		"mediasoup-client": "^3.7.7",
 		"solid-js": "^1.8.17"
 	}
