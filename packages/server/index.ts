@@ -8,6 +8,7 @@ import {
 import { mediasoupServerPromise, peerList } from "./mediasoup/mediasoupServer";
 import type { BennyWebsocketEnvelope } from "types";
 import type { TransportOptions } from "mediasoup-client/lib/types";
+import { env } from "bun";
 
 export const app = createApp({});
 const h3Router = createRouter();
@@ -56,7 +57,7 @@ h3Router.get(
       );
 
       // store the new webRtcTransport in the peerList, to be able to access it later
-      peerList.set(peer.id, webRtcTransport);
+      peerList.set(peer.id, { webRtcTransport });
     },
 
     async message(peer, message) {
@@ -71,7 +72,8 @@ h3Router.get(
       // Respond to getWebRtcTransportOptions()
       if (envelope.command.startsWith("getWebRtcTransportOptions")) {
         // 2. When client requests WebRtcTransportOptions: getWebRtcTransportOptions
-        const webRtcTransport = peerList.get(peer.id);
+        const { webRtcTransport } = peerList.get(peer.id) ??
+          { webRtcTransport: undefined };
 
         if (!webRtcTransport) {
           peer.send({
@@ -99,7 +101,10 @@ h3Router.get(
       }
 
       if (envelope.command.startsWith("connectWebRtcTransport")) {
-        const webRtcTransport = peerList.get(peer.id);
+        const { webRtcTransport } = peerList.get(peer.id) ?? {
+          webRtcTransport: undefined,
+        };
+
         const { dtlsParameters } = envelope.payload as TransportOptions;
 
         if (!webRtcTransport) {
@@ -111,6 +116,45 @@ h3Router.get(
         }
 
         await webRtcTransport.connect({ dtlsParameters });
+      }
+
+      if (envelope.command === "newProducer") {
+        const { webRtcTransport } = peerList.get(peer.id) ??
+          { webRtcTransport: undefined };
+        const producerClientId = envelope.payload.producerClientId;
+
+        if (!webRtcTransport) {
+          peer.send({
+            command: "error",
+            payload: "No WebRtcTransport found for this websocket connection!",
+          });
+          return;
+        }
+
+        const producer = await webRtcTransport?.produce(envelope.payload);
+
+        if (!producer) {
+          peer.send({
+            command: "error",
+            payload:
+              "Error to create producer on server side for producerClientId `${producerClientId}`",
+          });
+          return;
+        }
+
+        peerList.set(peer.id, { webRtcTransport, producer1: producer });
+
+        peer.send(
+          JSON.stringify(
+            {
+              command: "ServerSideProducerCreated",
+              payload: {
+                producerServerId: producer.id,
+                producerClientId,
+              },
+            } satisfies BennyWebsocketEnvelope,
+          ),
+        );
       }
     },
 

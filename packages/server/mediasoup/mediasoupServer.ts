@@ -9,7 +9,10 @@ export const mediasoupServerPromise: Promise<{
 // Map of websocket peers with their webrtc transports
 export const peerList = new Map<
   string,
-  mediasoup.types.WebRtcTransport<mediasoup.types.AppData>
+  {
+    webRtcTransport: mediasoup.types.WebRtcTransport<mediasoup.types.AppData>;
+    producer1?: mediasoup.types.Producer<mediasoup.types.AppData>;
+  }
 >();
 
 async function runMediasoupServer() {

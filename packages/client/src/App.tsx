@@ -5,7 +5,14 @@ import {createStore} from 'solid-js/store';
 import {BennyWebsocketEnvelope} from 'types';
 import {ProducerOptions, TransportOptions} from 'mediasoup-client/lib/types';
 import {AudioDeviceSelector} from './features/send-audio/AudioDeviceSelector';
-import {server} from 'typescript';
+import {produce} from 'solid-js/store';
+
+type ProducerListEntry = {
+	producerServerId?: string;
+	producerClientId: string;
+	// the callback which needs to be called with the producerServerId on arrival via ws
+	callback?: (id: {id: string}) => void;
+};
 
 /**
  *
@@ -23,6 +30,9 @@ const App: Component = () => {
 	const wsState = createWSState(ws);
 	const states = ['Connecting', 'Connected', 'Disconnecting', 'Disconnected'];
 	const [wsMessages, setWsMessages] = createStore<WSMessage[]>([]);
+
+	// used when server answers for a createProducer request
+	const [producerList, setProducerListEntry] = createStore<Array<ProducerListEntry>>([]);
 
 	const [webRtcTransportOptions, setWebRtcTransportOptions] = createSignal<
 		TransportOptions | undefined
@@ -44,6 +54,26 @@ const App: Component = () => {
 
 		if (msg.command === 'Error') {
 			console.error('Error from server:', msg.payload);
+		}
+
+		if (msg.command === 'ServerSideProducerCreated') {
+			console.log('Step 7 answer: newProducer', msg.payload);
+			const producer = producerList.find(
+				(entry: ProducerListEntry) => entry.producerClientId === msg.payload.producerClientId
+			);
+
+			if (!producer) {
+				console.error(
+					'No producer found for client side producer id: ',
+					msg.payload.producerClientId
+				);
+				return;
+			}
+
+			setProducerListEntry(producerList.indexOf(producer), {
+				producerServerId: msg.payload.producerServerId,
+			});
+			producer.callback?.({id: msg.payload.producerServerId});
 		}
 	});
 
@@ -127,10 +157,19 @@ const App: Component = () => {
 							kind,
 							rtpParameters,
 							appData,
+							producerClientId: crypto.randomUUID(),
 						},
 					} satisfies BennyWebsocketEnvelope;
 
+					setProducerListEntry(producerList.length, {
+						producerClientId: wsEnvelope.payload.producerClientId,
+						callback,
+					});
+
 					ws.send(JSON.stringify(wsEnvelope));
+
+					// TODO: only call callback when server received the message
+					// TODO: swich to trpc on the server side (probably even without websockets, makes call-response cycle easier!)
 				} catch (error: unknown) {
 					errback(
 						new Error(
@@ -156,17 +195,17 @@ const App: Component = () => {
 		}),
 		async ({sendTransport, stream}) => {
 			if (!sendTransport) {
-				console.error('Step 6: createProducer: No sendTransport available');
+				console.error('Step 7: createProducer: No sendTransport available');
 				return;
 			}
 
 			if (!stream) {
-				console.error('Step 6: createProducer: No stream available');
+				console.error('Step 7: createProducer: No stream available');
 				return;
 			}
 
 			const audioTrack = stream.getAudioTracks()[0];
-			console.log('Step 6: audioTrack', audioTrack);
+			console.log('Step 7: audioTrack', audioTrack);
 			// Options for the producer are optional! :)
 			const options = {
 				// TODO: get a MediaStreamTrack from a device, preferrably a mic

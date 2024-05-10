@@ -28,5 +28,16 @@ export type BennyWebsocketEnvelope = {
     kind: MediaKind;
     rtpParameters: RtpParameters;
     appData: AppData;
+    // custom property of bjesuiter
+    producerClientId: string;
+  };
+} | {
+  command: "ServerSideProducerCreated";
+  payload: {
+    // official id of the producer on the server side
+    producerServerId: string;
+
+    // custom property of bjesuiter to identify the producer "creation request" on the client side
+    producerClientId: string;
   };
 };
