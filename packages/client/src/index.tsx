@@ -2,9 +2,13 @@
 import {render} from 'solid-js/web';
 import {QueryClient, QueryClientProvider} from '@tanstack/solid-query';
 import {SolidQueryDevtools} from '@tanstack/solid-query-devtools';
+import {Route, Router} from '@solidjs/router';
 
 import './index.css';
 import App from './App';
+import {ErrorPage404} from './features/pages/404.page';
+import {SendPage} from './features/send-audio/send.page';
+import {ReceivePage} from './features/receive-audio/receive.page';
 
 const root = document.getElementById('root');
 const queryClient = new QueryClient();
@@ -18,7 +22,12 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 render(
 	() => (
 		<QueryClientProvider client={queryClient}>
-			<App />
+			<Router root={App}>
+				<Route path="send" component={SendPage}></Route>
+				<Route path="receive" component={ReceivePage}></Route>
+				<Route path="*404" component={ErrorPage404} />
+			</Router>
+
 			<SolidQueryDevtools initialIsOpen={true} />
 			{/* <Router>
 					<Routes>
