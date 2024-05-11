@@ -4,7 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "bunx listhen --ws -w index.ts",
-		"dev-server": "tsx watch server.ts"
+		"express": "tsx watch server.ts"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
