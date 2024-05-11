@@ -1,14 +1,15 @@
 import cookie from "cookie";
 import type { CookieSerializeOptions } from "cookie";
+import * as express from "express";
 
-export function getCookies(req: Request) {
-  const cookieHeader = req.headers.get("Cookie");
+export function getCookies(req: express.Request) {
+  const cookieHeader = req.headers.cookie;
   if (!cookieHeader) return {};
   return cookie.parse(cookieHeader);
 }
 
-export function getCookie(req: Request, name: string) {
-  const cookieHeader = req.headers.get("Cookie");
+export function getCookie(req: express.Request, name: string) {
+  const cookieHeader = req.headers.cookie;
   if (!cookieHeader) return;
   const cookies = cookie.parse(cookieHeader);
   return cookies[name];
