@@ -137,6 +137,8 @@ export const trpcRouter = router({
       });
     }
 
+    logger.debug(`Creating producer for transport: ${input.transportId}`);
+
     const producer = await transport.produce({
       id: input.transportId,
       kind: input.kind,
