@@ -22,6 +22,7 @@
     "@tanstack/solid-query-devtools": "^5.34.1",
     "@trpc/client": "^10.45.2",
     "mediasoup-client": "^3.7.7",
-    "solid-js": "^1.8.17"
+    "solid-js": "^1.8.17",
+    "zod": "^3.23.8"
   }
 }

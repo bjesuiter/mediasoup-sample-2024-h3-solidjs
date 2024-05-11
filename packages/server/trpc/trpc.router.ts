@@ -4,6 +4,7 @@ import {
 } from "../mediasoup/mediasoupServer";
 import { logger } from "../utils/logger";
 import { publicProcedure, router } from "./trpc.base";
+import { z } from "zod";
 
 export const trpcRouter = router({
   ping: publicProcedure.query(() => "pong"),
@@ -28,27 +29,36 @@ export const trpcRouter = router({
   }),
 
   // Step 2 for sending: createWebRtcTransport
-  createServerWebRtcTransport: publicProcedure.mutation(async () => {
-    const { router } = await mediasoupServerPromise;
-    const webRtcTransport = await router.createWebRtcTransport(
-      {
-        listenInfos: [
-          {
-            protocol: "udp",
-            ip: "0.0.0.0",
-            // = public address, if needed
-            // announcedAddress: "88.12.10.41",
-          },
-        ],
-        // enableUdp: true,
-        // enableTcp: true,
-        // preferUdp: true,
-      },
-    );
+  createServerWebRtcTransport: publicProcedure
+    .input(z.object({
+      clientUuid: z.string(),
+    })).mutation(async ({ input }) => {
+      const { router } = await mediasoupServerPromise;
+      const webRtcTransport = await router.createWebRtcTransport(
+        {
+          listenInfos: [
+            {
+              protocol: "udp",
+              ip: "0.0.0.0",
+              // = public address, if needed
+              // announcedAddress: "88.12.10.41",
+            },
+          ],
+          // enableUdp: true,
+          // enableTcp: true,
+          // preferUdp: true,
+        },
+      );
 
-    // store webRtcTransport for this client;
-    // TODO: finish
-  }),
+      // store webRtcTransport for this client
+      const client = connectedClients.get(input.clientUuid);
+      if (!client) {
+        logger.error(`Client not found: ${input.clientUuid}`);
+        return;
+      }
+
+      client.transports.push(webRtcTransport);
+    }),
 });
 
 // Export type router type signature,
