@@ -8,20 +8,19 @@ import {
 import { mediasoupServerPromise, peerList } from "./mediasoup/mediasoupServer";
 import type { BennyWebsocketEnvelope } from "types";
 import type { TransportOptions } from "mediasoup-client/lib/types";
-import { env } from "bun";
 
 export const app = createApp({});
 const h3Router = createRouter();
 
 // open: http://localhost:3000/
-h3Router.get(
-  "/",
-  defineEventHandler(() =>
-    fetch(
-      "https://raw.githubusercontent.com/unjs/crossws/main/examples/h3/public/index.html",
-    ).then((r) => r.text())
-  ),
-);
+// h3Router.get(
+//   "/",
+//   defineEventHandler(() =>
+//     fetch(
+//       "https://raw.githubusercontent.com/unjs/crossws/main/examples/h3/public/index.html",
+//     ).then((r) => r.text())
+//   ),
+// );
 
 // open: http://localhost:3000/getServerRtpCapabilities
 h3Router.get(
