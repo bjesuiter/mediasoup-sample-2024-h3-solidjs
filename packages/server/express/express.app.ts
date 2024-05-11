@@ -14,6 +14,8 @@ expressApp.use(session({
   secret: "my-secret",
   // only use cookies via https
   cookie: { secure: false },
+  saveUninitialized: true,
+  resave: false,
 }));
 
 expressApp.use(
