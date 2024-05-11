@@ -1,7 +1,7 @@
 import { mediasoupServerPromise } from "../mediasoup/mediasoupServer";
 import { publicProcedure, router } from "./trpc.base";
 
-export const appRouter = router({
+export const trpcRouter = router({
   // e.g. /ping
   ping: publicProcedure.query(() => "pong"),
 
@@ -14,4 +14,4 @@ export const appRouter = router({
 
 // Export type router type signature,
 // NOT the router itself.
-export type AppRouter = typeof appRouter;
+export type TrpcRouter = typeof trpcRouter;
