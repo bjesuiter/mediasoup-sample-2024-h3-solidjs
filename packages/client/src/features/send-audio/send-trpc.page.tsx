@@ -1,6 +1,7 @@
-import {createEffect, createResource} from 'solid-js';
+import {For, createEffect, createResource, createSignal} from 'solid-js';
 import {trpcClient} from '../../trpc/trpc-client';
 import * as mediasoupClient from 'mediasoup-client';
+import {AudioDeviceSelector} from './AudioDeviceSelector';
 
 export function SendTrpcPage() {
 	// Step 1: Get ServerRtpCapabilities
@@ -104,6 +105,9 @@ export function SendTrpcPage() {
 		}
 	);
 
+	// Step 6: Create a media track (set by a component in the template)
+	const [stream, setStream] = createSignal<MediaStream | undefined>();
+
 	// debug effect to force recomputation of resources
 	createEffect(() => {
 		device();
@@ -112,8 +116,17 @@ export function SendTrpcPage() {
 	});
 
 	return (
-		<div>
+		<div style="display: flex; flex-flow: column nowrap; gap: 24px; padding: 16px">
 			<h1>Send Audio (with trpc + mediasoup)</h1>
+			<fieldset>
+				<legend>Infos</legend>
+				<div style="display: flex; flex-flow: column nowrap; gap: 24px; padding: 16px">
+					<span>clientUuid: {clientUuid()}</span>
+					<span>Stream: {stream()?.getAudioTracks()[0].label}</span>
+				</div>
+			</fieldset>
+
+			<AudioDeviceSelector onDeviceSelected={stream => setStream(stream)} />
 		</div>
 	);
 }
