@@ -79,7 +79,6 @@ export const SendPage: Component = () => {
 	// ws.send('it works');
 	// createEffect(on(ws., msg => console.log(msg), {defer: true}));
 
-	// todo: refactor the createResource to use tanStackQuery
 	// Step 1: Load ServerRtpCapabilities
 	const [serverRtpCapabilities] = createResource(async () => {
 		const response = await fetch('http://localhost:3000/getServerRtpCapabilities');
@@ -251,5 +250,3 @@ export const SendPage: Component = () => {
 		</div>
 	);
 };
-
-export default SendPage;

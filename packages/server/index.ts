@@ -34,6 +34,18 @@ h3Router.get(
 );
 
 h3Router.get(
+  "/producers",
+  defineEventHandler(async (event) => {
+    handleCors(event, { origin: "*" });
+    return Array.from(peerList)
+      .map(([peerKey, value]) => {
+        return value.producer1?.id;
+      })
+      .filter((elem) => elem !== undefined);
+  }),
+);
+
+h3Router.get(
   "/_ws",
   defineWebSocketHandler({
     async open(peer) {
@@ -155,6 +167,34 @@ h3Router.get(
             } satisfies BennyWebsocketEnvelope,
           ),
         );
+      }
+
+      if (envelope.command === "newConsumer") {
+        const { webRtcTransport } = peerList.get(peer.id) ??
+          { webRtcTransport: undefined };
+        // const consumerClientId = envelope.payload.consumerClientId;
+
+        const soupServer = await mediasoupServerPromise;
+
+        const canSelectedStreamBeConsumed = soupServer.router.canConsume({
+          producerId: envelope.payload.producerId,
+          rtpCapabilities: envelope.payload.deviceRtpCapabilities,
+        });
+
+        console.log(
+          `can Stream ${envelope.payload.producerId} be played by consumer device?`,
+          canSelectedStreamBeConsumed,
+        );
+
+        // TODO: Go on here with webrtc consumer creation
+
+        if (!webRtcTransport) {
+          peer.send({
+            command: "error",
+            payload: "No WebRtcTransport found for this websocket connection!",
+          });
+          return;
+        }
       }
     },
 
