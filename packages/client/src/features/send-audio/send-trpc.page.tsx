@@ -3,7 +3,6 @@ import {trpcClient} from '../../trpc/trpc-client';
 import * as mediasoupClient from 'mediasoup-client';
 import {AudioDeviceSelector} from './AudioDeviceSelector';
 import {ProducerOptions} from 'mediasoup-client/lib/types';
-import {send} from 'vite';
 
 export function SendTrpcPage() {
 	// Step 0: Connect with the server which assigns a new clientUuid (aka sessionId)
