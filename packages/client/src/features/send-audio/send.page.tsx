@@ -86,7 +86,6 @@ export const SendPage: Component = () => {
 		console.log('Step 1: serverRtpCapabilities', responseObj);
 		return responseObj;
 	});
-	const debugServerRtpCapabilities = () => JSON.stringify(serverRtpCapabilities(), null, 2);
 
 	// Step 2 & 3
 	const [device] = createResource(
