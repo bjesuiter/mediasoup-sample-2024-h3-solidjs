@@ -107,42 +107,42 @@ export function SendTrpcPage() {
 	const [stream, setStream] = createSignal<MediaStream | undefined>();
 
 	// Step 7: Create a producer
-	// const [producer] = createResource(
-	// 	() => ({
-	// 		sendTransport: sendTransport(),
-	// 		stream: stream(),
-	// 	}),
-	// 	async ({sendTransport, stream}) => {
-	// 		if (!sendTransport || !stream) return;
+	const [producer] = createResource(
+		() => ({
+			sendTransport: sendTransport(),
+			stream: stream(),
+		}),
+		async ({sendTransport, stream}) => {
+			if (!sendTransport || !stream) return;
 
-	// 		const audioTrack = stream.getAudioTracks()[0];
-	// 		console.log('Step 7: audioTrack', audioTrack);
+			const audioTrack = stream.getAudioTracks()[0];
+			console.log('Step 7: audioTrack', audioTrack);
 
-	// 		if (!audioTrack) {
-	// 			console.error('Step 7: createProducer: No audioTrack available');
-	// 		}
+			if (!audioTrack) {
+				console.error('Step 7: createProducer: No audioTrack available');
+			}
 
-	// 		// Options for the producer are optional! :)
-	// 		const options = {
-	// 			track: audioTrack,
-	// 			// encodings: [{ssrc: 111111}],
-	// 			// codecOptions: {},
-	// 			// codec: {kind: 'audio', mimeType: 'audio/opus', clockRate: 48000, channels: 2},
-	// 		} satisfies ProducerOptions;
+			// Options for the producer are optional! :)
+			const options = {
+				track: audioTrack,
+				// encodings: [{ssrc: 111111}],
+				// codecOptions: {},
+				// codec: {kind: 'audio', mimeType: 'audio/opus', clockRate: 48000, channels: 2},
+			} satisfies ProducerOptions;
 
-	// 		const producer = await sendTransport.produce(options);
+			const producer = await sendTransport.produce(options);
 
-	// 		console.log('Step 7: Finished producer', producer);
-	// 		return producer;
-	// 	}
-	// );
+			console.log('Step 7: Finished producer', producer);
+			return producer;
+		}
+	);
 
 	// debug effect to force recomputation of resources
 	createEffect(() => {
-		// device();
+		device();
 		clientUuid();
-		// sendTransport();
-		// producer();
+		sendTransport();
+		producer();
 	});
 
 	return (
