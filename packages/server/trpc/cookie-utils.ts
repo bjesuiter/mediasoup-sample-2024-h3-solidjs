@@ -16,10 +16,10 @@ export function getCookie(req: express.Request, name: string) {
 }
 
 export function setCookie(
-  resHeaders: Headers,
+  res: express.Response,
   name: string,
   value: string,
   options?: CookieSerializeOptions,
 ) {
-  resHeaders.append("Set-Cookie", cookie.serialize(name, value, options));
+  res.appendHeader("Set-Cookie", cookie.serialize(name, value, options));
 }

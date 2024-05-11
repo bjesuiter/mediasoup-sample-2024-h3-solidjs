@@ -1,17 +1,22 @@
 import { initTRPC } from "@trpc/server";
-import * as trpcExpress from "@trpc/server/adapters/express";
+import * as express from "express";
 import { getCookie, setCookie } from "./cookie-utils";
+import type { CookieSerializeOptions } from "cookie";
 
 // Factory for trpc context for 'express' adapter - created per request
 export const createContext = ({
   req,
   res,
-}: trpcExpress.CreateExpressContextOptions) => {
+}: { req: express.Request; res: express.Response }) => {
   return {
-    request: req,
-    response: res,
-    getCookie,
-    setCookie,
+    req,
+    res,
+    getCookie: (name: string) => getCookie(req, name),
+    setCookie: (
+      name: string,
+      value: string,
+      options?: CookieSerializeOptions,
+    ) => setCookie(res, name, value, options),
   };
 };
 
