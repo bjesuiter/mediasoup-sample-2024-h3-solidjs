@@ -28,7 +28,7 @@ render(
 				<Route path="*404" component={ErrorPage404} />
 			</Router>
 
-			<SolidQueryDevtools initialIsOpen={true} />
+			<SolidQueryDevtools initialIsOpen={false} />
 			{/* <Router>
 					<Routes>
 						<Route path="/" component={App} />
