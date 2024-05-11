@@ -20,13 +20,7 @@ import { TRPCError } from "@trpc/server";
 export const trpcRouter = router({
   ping: publicProcedure.query(() => "pong"),
 
-  // Step 1 for sending & receiving: getServerRtpCapabilities
-  getServerRtpCapabilities: publicProcedure.query(async () => {
-    const { router } = await mediasoupServerPromise;
-    return router.rtpCapabilities;
-  }),
-
-  // Step 2 for sending & receiving: connectClient
+  // Step 0 for sending & receiving: connectClient
   connectClient: publicProcedure.mutation(async ({ ctx }) => {
     if (connectedClients.has(ctx.sessionId)) {
       logger.info(`Known client reconnected: ${ctx.sessionId}`);
@@ -40,6 +34,12 @@ export const trpcRouter = router({
     logger.info(`New client connected: ${ctx.sessionId}`);
 
     return ctx.sessionId;
+  }),
+
+  // Step 1 for sending & receiving: getServerRtpCapabilities
+  getServerRtpCapabilities: publicProcedure.query(async () => {
+    const { router } = await mediasoupServerPromise;
+    return router.rtpCapabilities;
   }),
 
   // Step 2 for sending: createWebRtcTransport

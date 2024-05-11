@@ -5,18 +5,18 @@ import {AudioDeviceSelector} from './AudioDeviceSelector';
 import {ProducerOptions} from 'mediasoup-client/lib/types';
 
 export function SendTrpcPage() {
+	// Step 0: Connect with the server which assigns a new clientUuid (aka sessionId)
+	const [clientUuid] = createResource(async () => {
+		const clientUuid = await trpcClient.connectClient.mutate();
+		console.log('Step 2: Connected to server', {clientUuid});
+		return clientUuid;
+	});
+
 	// Step 1: Get ServerRtpCapabilities
 	const [serverRtpCapabilities] = createResource(async () => {
 		const serverRtpCapabilities = await trpcClient.getServerRtpCapabilities.query();
 		console.log('Step 1: serverRtpCapabilities', serverRtpCapabilities);
 		return serverRtpCapabilities;
-	});
-
-	// Step 2: Connect with the server which assigns a new uuid
-	const [clientUuid] = createResource(async () => {
-		const clientUuid = await trpcClient.connectClient.mutate();
-		console.log('Step 2: Connected to server', {clientUuid});
-		return clientUuid;
 	});
 
 	// Step 3 & 4: Create device and load serverRtpCapabilities into it
