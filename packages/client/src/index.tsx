@@ -9,7 +9,7 @@ import App from './App';
 import {ErrorPage404} from './features/pages/404.page';
 import {SendPage} from './features/send-audio/send.page';
 import {ReceivePage} from './features/receive-audio/receive.page';
-import {SendTrpcPage} from './features/pages/send-trpc.page';
+import {SendTrpcPage} from './features/send-audio/send-trpc.page';
 
 const root = document.getElementById('root');
 const queryClient = new QueryClient();
