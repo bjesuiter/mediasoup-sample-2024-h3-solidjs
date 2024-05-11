@@ -8,6 +8,13 @@ export const trpcClient = createTRPCProxyClient<TrpcRouter>({
   links: [
     httpBatchLink({
       url: "http://localhost:4000/trpc",
+      fetch(url, options) {
+        return fetch(url, {
+          ...options,
+          // allow cross-origin credential cookies to be sent to trpc endpoint
+          credentials: "include",
+        });
+      },
     }),
   ],
 });
