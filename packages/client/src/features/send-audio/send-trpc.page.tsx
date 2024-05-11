@@ -39,72 +39,69 @@ export function SendTrpcPage() {
 		}
 	);
 
-	// Step 5: Create a transport for sending audio
-	// const [sendTransport] = createResource(
-	// 	() => ({
-	// 		device: device(),
-	// 		clientUuid: clientUuid(),
-	// 	}),
-	// 	async ({device, clientUuid}) => {
-	// 		if (!device || !clientUuid) return;
-	// 		const serverTransport = await trpcClient.createServerWebRtcTransport.mutate({
-	// 			clientUuid: clientUuid,
-	// 		});
+	// Step 4: Create a transport for sending audio
+	const [sendTransport] = createResource(
+		() => ({
+			device: device(),
+		}),
+		async ({device}) => {
+			if (!device) return;
 
-	// 		if (!serverTransport) {
-	// 			console.error(`Server transport not created!`);
-	// 			return;
-	// 		}
+			// will get clientUuid via sessionId in cookie
+			const serverTransport = await trpcClient.createServerWebRtcTransport.mutate();
 
-	// 		const sendTransport = device.createSendTransport(serverTransport.transportOptions);
+			if (!serverTransport) {
+				console.error(`Server transport not created!`);
+				return;
+			}
 
-	// 		// Adding event listeners for 'connect' and 'produce'
-	// 		// Connects the transport lazily, when the first producer wants to send data
-	// 		sendTransport.on('connect', async ({dtlsParameters}, callback, errback) => {
-	// 			try {
-	// 				await trpcClient.connectWebRtcTransport.mutate({
-	// 					clientUuid,
-	// 					transportId: sendTransport.id,
-	// 					dtlsParameters,
-	// 				});
-	// 				// go on with client side processing of webrtc (for example: creating producers, etc.)
-	// 				callback();
-	// 				console.info('Step 5b: sendTransport connected');
-	// 			} catch (error: unknown) {
-	// 				errback(
-	// 					new Error(
-	// 						`Error while sending DTLS parameters: ${JSON.stringify(error, undefined, '\t')}`
-	// 					)
-	// 				);
-	// 			}
-	// 		});
+			const sendTransport = device.createSendTransport(serverTransport.transportOptions);
 
-	// 		sendTransport.on('produce', async ({kind, rtpParameters, appData}, callback, errback) => {
-	// 			// Signal parameters to the server side transport and retrieve the id of
-	// 			// the server side new producer.
-	// 			try {
-	// 				const result = await trpcClient.createProducer.mutate({
-	// 					clientUuid,
-	// 					transportId: sendTransport.id,
-	// 					kind,
-	// 					rtpParameters,
-	// 					appData,
-	// 				});
+			// Adding event listeners for 'connect' and 'produce'
+			// Connects the transport lazily, when the first producer wants to send data
+			sendTransport.on('connect', async ({dtlsParameters}, callback, errback) => {
+				try {
+					await trpcClient.connectWebRtcTransport.mutate({
+						transportId: sendTransport.id,
+						dtlsParameters,
+					});
+					// go on with client side processing of webrtc (for example: creating producers, etc.)
+					callback();
+					console.info('Step 5b: sendTransport connected');
+				} catch (error: unknown) {
+					errback(
+						new Error(
+							`Error while sending DTLS parameters: ${JSON.stringify(error, undefined, '\t')}`
+						)
+					);
+				}
+			});
 
-	// 				callback({id: result.producerServerId});
-	// 			} catch (error: unknown) {
-	// 				errback(
-	// 					new Error(
-	// 						`Error while sending DTLS parameters: ${JSON.stringify(error, undefined, '\t')}`
-	// 					)
-	// 				);
-	// 			}
-	// 		});
+			sendTransport.on('produce', async ({kind, rtpParameters, appData}, callback, errback) => {
+				// Signal parameters to the server side transport and retrieve the id of
+				// the server side new producer.
+				try {
+					const result = await trpcClient.createProducer.mutate({
+						transportId: sendTransport.id,
+						kind,
+						rtpParameters,
+						appData,
+					});
 
-	// 		console.log('Step 5a: sendTransport', sendTransport);
-	// 		return sendTransport;
-	// 	}
-	// );
+					callback({id: result.producerServerId});
+				} catch (error: unknown) {
+					errback(
+						new Error(
+							`Error while sending DTLS parameters: ${JSON.stringify(error, undefined, '\t')}`
+						)
+					);
+				}
+			});
+
+			console.log('Step 5a: sendTransport', sendTransport);
+			return sendTransport;
+		}
+	);
 
 	// Step 6: Create a media track (set by a component in the template)
 	const [stream, setStream] = createSignal<MediaStream | undefined>();
