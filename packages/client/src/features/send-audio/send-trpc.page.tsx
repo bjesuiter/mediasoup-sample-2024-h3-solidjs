@@ -19,25 +19,25 @@ export function SendTrpcPage() {
 		return serverRtpCapabilities;
 	});
 
-	// Step 3 & 4: Create device and load serverRtpCapabilities into it
-	// const [device] = createResource(
-	// 	() => ({
-	// 		serverRtpCaps: serverRtpCapabilities(),
-	// 	}),
-	// 	async ({serverRtpCaps}) => {
-	// 		if (!serverRtpCaps) return;
+	// Step 2 & 3: Create device and load serverRtpCapabilities into it
+	const [device] = createResource(
+		() => ({
+			serverRtpCaps: serverRtpCapabilities(),
+		}),
+		async ({serverRtpCaps}) => {
+			if (!serverRtpCaps) return;
 
-	// 		// Step 3: Create a device
-	// 		const device = new mediasoupClient.Device();
+			// Step 3: Create a device
+			const device = new mediasoupClient.Device();
 
-	// 		//Step 4: Call device.load with serverRtpCapabilities
-	// 		await device.load({routerRtpCapabilities: serverRtpCaps});
+			//Step 4: Call device.load with serverRtpCapabilities
+			await device.load({routerRtpCapabilities: serverRtpCaps});
 
-	// 		console.log('Step 3 & 4: device', device);
+			console.log('Step 2 & 3: device', device);
 
-	// 		return device;
-	// 	}
-	// );
+			return device;
+		}
+	);
 
 	// Step 5: Create a transport for sending audio
 	// const [sendTransport] = createResource(
