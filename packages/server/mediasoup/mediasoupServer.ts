@@ -15,6 +15,12 @@ export const peerList = new Map<
   }
 >();
 
+// Stores a self-defined clientId and the corresponding data, like "WebRtcTransport" for that client
+export const connectedClients = new Map<string, {
+  // all webrtc transports for this client (because i probably need send and receive transports in parallel for the same client);
+  transports: Array<mediasoup.types.WebRtcTransport<mediasoup.types.AppData>>;
+}>();
+
 async function runMediasoupServer() {
   const mediaCodecs = [
     {
