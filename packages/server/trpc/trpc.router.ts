@@ -2,6 +2,7 @@ import {
   connectedClients,
   mediasoupServerPromise,
 } from "../mediasoup/mediasoupServer";
+import { logger } from "../utils/logger";
 import { publicProcedure, router } from "./trpc.base";
 
 export const trpcRouter = router({
@@ -21,6 +22,8 @@ export const trpcRouter = router({
     connectedClients.set(newClientUuid, {
       transports: [],
     });
+
+    logger.info(`Client connected: ${newClientUuid}`);
     return newClientUuid;
   }),
 

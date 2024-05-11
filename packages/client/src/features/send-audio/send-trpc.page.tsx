@@ -10,7 +10,14 @@ export function SendTrpcPage() {
 		return serverRtpCapabilities;
 	});
 
-	// Step 2 & 3: Create device and load serverRtpCapabilities into it
+	// Step 2: Connect with the server which assigns a new uuid
+	const [clientUuid] = createResource(async () => {
+		const clientUuid = await trpcClient.connectClient.mutate();
+		console.log('Step 2: Connected to server', {clientUuid});
+		return clientUuid;
+	});
+
+	// Step 3 & 4: Create device and load serverRtpCapabilities into it
 	const [device] = createResource(
 		() => ({
 			serverRtpCaps: serverRtpCapabilities(),
@@ -18,13 +25,13 @@ export function SendTrpcPage() {
 		async ({serverRtpCaps}) => {
 			if (!serverRtpCaps) return;
 
-			// Step 2: Create a device
+			// Step 3: Create a device
 			const device = new mediasoupClient.Device();
 
-			//Step 3: Call device.load with serverRtpCapabilities
+			//Step 4: Call device.load with serverRtpCapabilities
 			await device.load({routerRtpCapabilities: serverRtpCaps});
 
-			console.log('Step 2 & 3: device', device);
+			console.log('Step 3 & 4: device', device);
 
 			return device;
 		}
@@ -33,6 +40,7 @@ export function SendTrpcPage() {
 	// debug effect to force recomputation of resources
 	createEffect(() => {
 		device();
+		clientUuid();
 	});
 
 	return (
