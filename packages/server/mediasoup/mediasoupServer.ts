@@ -21,6 +21,11 @@ export const connectedClients = new Map<string, {
   transports: Array<mediasoup.types.WebRtcTransport<mediasoup.types.AppData>>;
 }>();
 
+export const producers = new Map<
+  string,
+  mediasoup.types.Producer<mediasoup.types.AppData>
+>();
+
 async function runMediasoupServer() {
   const mediaCodecs = [
     {

@@ -55,7 +55,6 @@ export function SendTrpcPage() {
 			}
 
 			const sendTransport = device.createSendTransport(serverTransport.transportOptions);
-			console.log('Step 5a: sendTransport', sendTransport);
 
 			// Adding event listeners for 'connect' and 'produce'
 			// Connects the transport lazily, when the first producer wants to send data
@@ -77,6 +76,31 @@ export function SendTrpcPage() {
 					);
 				}
 			});
+
+			sendTransport.on('produce', async ({kind, rtpParameters, appData}, callback, errback) => {
+				// Signal parameters to the server side transport and retrieve the id of
+				// the server side new producer.
+				try {
+					const result = await trpcClient.createProducer.mutate({
+						clientUuid,
+						transportId: sendTransport.id,
+						kind,
+						rtpParameters,
+						appData,
+					});
+
+					callback({id: result.producerServerId});
+				} catch (error: unknown) {
+					errback(
+						new Error(
+							`Error while sending DTLS parameters: ${JSON.stringify(error, undefined, '\t')}`
+						)
+					);
+				}
+			});
+
+			console.log('Step 5a: sendTransport', sendTransport);
+			return sendTransport;
 		}
 	);
 

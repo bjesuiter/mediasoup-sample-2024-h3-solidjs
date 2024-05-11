@@ -1,6 +1,7 @@
 import {
   connectedClients,
   mediasoupServerPromise,
+  producers,
 } from "../mediasoup/mediasoupServer";
 import { logger } from "../utils/logger";
 import { publicProcedure, router } from "./trpc.base";
@@ -105,6 +106,47 @@ export const trpcRouter = router({
     await transport.connect({
       dtlsParameters: input.dtlsParameters as DtlsParameters,
     });
+  }),
+
+  // Step 4: createProducer
+  createProducer: publicProcedure.input(z.object({
+    clientUuid: z.string(),
+    transportId: z.string(),
+    kind: z.enum(["audio", "video"]),
+    rtpParameters: z.any(),
+    appData: z.any(),
+  })).mutation(async ({ input }) => {
+    const client = connectedClients.get(input.clientUuid);
+    if (!client) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message:
+          `Cannot create producer, client not found for client id: ${input.clientUuid}`,
+      });
+    }
+
+    const transport = client?.transports.find(
+      (t) => t.id === input.transportId,
+    );
+    if (!transport) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message:
+          `Cannot create producer, transport not found for transport id: ${input.transportId}`,
+      });
+    }
+
+    const producer = await transport.produce({
+      id: input.transportId,
+      kind: input.kind,
+      rtpParameters: input.rtpParameters as RtpParameters,
+      appData: input.appData as AppData,
+    });
+    producers.set(producer.id, producer);
+
+    return {
+      producerServerId: producer.id,
+    };
   }),
 });
 
