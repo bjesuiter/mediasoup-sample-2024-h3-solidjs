@@ -1,19 +1,27 @@
 import { initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
+import { getCookie, setCookie } from "./cookie-utils";
 
 // Factory for trpc context for 'express' adapter - created per request
 export const createContext = ({
   req,
   res,
-}: trpcExpress.CreateExpressContextOptions) => ({}); // no context
+}: trpcExpress.CreateExpressContextOptions) => {
+  return {
+    request: req,
+    response: res,
+    getCookie,
+    setCookie,
+  };
+};
 
-export type Context = Awaited<ReturnType<typeof createContext>>;
+export type TRPCContext = Awaited<ReturnType<typeof createContext>>;
 
 /**
  * Initialization of tRPC backend
  * Should be done only once per backend!
  */
-const t = initTRPC.context<Context>().create();
+const t = initTRPC.context<TRPCContext>().create();
 
 /**
  * Export reusable router and procedure helpers
