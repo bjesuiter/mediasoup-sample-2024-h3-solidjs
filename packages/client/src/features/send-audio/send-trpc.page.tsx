@@ -37,10 +37,54 @@ export function SendTrpcPage() {
 		}
 	);
 
+	// Step 5: Create a transport for sending audio
+	const [sendTransport] = createResource(
+		() => ({
+			device: device(),
+			clientUuid: clientUuid(),
+		}),
+		async ({device, clientUuid}) => {
+			if (!device || !clientUuid) return;
+			const serverTransport = await trpcClient.createServerWebRtcTransport.mutate({
+				clientUuid: clientUuid,
+			});
+
+			if (!serverTransport) {
+				console.error(`Server transport not created!`);
+				return;
+			}
+
+			const sendTransport = device.createSendTransport(serverTransport.transportOptions);
+			console.log('Step 5a: sendTransport', sendTransport);
+
+			// Adding event listeners for 'connect' and 'produce'
+			// Connects the transport lazily, when the first producer wants to send data
+			sendTransport.on('connect', async ({dtlsParameters}, callback, errback) => {
+				try {
+					await trpcClient.connectWebRtcTransport.mutate({
+						clientUuid,
+						transportId: sendTransport.id,
+						dtlsParameters,
+					});
+					// go on with client side processing of webrtc (for example: creating producers, etc.)
+					callback();
+					console.info('Step 5b: sendTransport connected');
+				} catch (error: unknown) {
+					errback(
+						new Error(
+							`Error while sending DTLS parameters: ${JSON.stringify(error, undefined, '\t')}`
+						)
+					);
+				}
+			});
+		}
+	);
+
 	// debug effect to force recomputation of resources
 	createEffect(() => {
 		device();
 		clientUuid();
+		sendTransport();
 	});
 
 	return (

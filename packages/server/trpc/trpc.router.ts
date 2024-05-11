@@ -14,6 +14,7 @@ import type {
   RtpParameters,
   TransportOptions,
 } from "mediasoup-client/lib/types";
+import { TRPCError } from "@trpc/server";
 
 export const trpcRouter = router({
   ping: publicProcedure.query(() => "pong"),
@@ -80,6 +81,31 @@ export const trpcRouter = router({
         transportOptions,
       };
     }),
+
+  // Step 3: connectWebRtcTransport
+  connectWebRtcTransport: publicProcedure.input(z.object({
+    clientUuid: z.string(),
+    transportId: z.string(),
+    // TODO: check typing against DtlsParameters of mediasoup-client
+    dtlsParameters: z.any(),
+  })).mutation(async ({ input }) => {
+    const client = connectedClients.get(input.clientUuid);
+
+    const transport = client?.transports.find(
+      (t) => t.id === input.transportId,
+    );
+    if (!transport) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message:
+          `Cannot connect, transport not found for transport id: ${input.transportId}`,
+      });
+    }
+
+    await transport.connect({
+      dtlsParameters: input.dtlsParameters as DtlsParameters,
+    });
+  }),
 });
 
 // Export type router type signature,
