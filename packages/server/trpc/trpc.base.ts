@@ -8,9 +8,12 @@ export const createContext = ({
   req,
   res,
 }: { req: express.Request; res: express.Response }) => {
+  const sessionId = req.sessionID;
+
   return {
-    req,
-    res,
+    // req,
+    // res,
+    sessionId,
     getCookie: (name: string) => getCookie(req, name),
     setCookie: (
       name: string,

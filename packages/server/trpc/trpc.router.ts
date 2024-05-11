@@ -27,16 +27,19 @@ export const trpcRouter = router({
   }),
 
   // Step 2 for sending & receiving: connectClient
-  connectClient: publicProcedure.mutation(async () => {
-    // basically a random id for each connected browser
-    const newClientUuid = crypto.randomUUID();
+  connectClient: publicProcedure.mutation(async ({ ctx }) => {
+    if (connectedClients.has(ctx.sessionId)) {
+      logger.info(`Known client reconnected: ${ctx.sessionId}`);
+      return ctx.sessionId;
+    }
+
     // init new client with empty transports
-    connectedClients.set(newClientUuid, {
+    connectedClients.set(ctx.sessionId, {
       transports: [],
     });
+    logger.info(`New client connected: ${ctx.sessionId}`);
 
-    logger.info(`Client connected: ${newClientUuid}`);
-    return newClientUuid;
+    return ctx.sessionId;
   }),
 
   // Step 2 for sending: createWebRtcTransport
