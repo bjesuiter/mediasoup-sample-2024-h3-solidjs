@@ -43,57 +43,55 @@ export const trpcRouter = router({
   }),
 
   // Step 2 for sending: createWebRtcTransport
-  createServerWebRtcTransport: publicProcedure
-    .input(z.object({
-      clientUuid: z.string(),
-    })).mutation(async ({ input }) => {
-      const { router } = await mediasoupServerPromise;
-      const webRtcTransport = await router.createWebRtcTransport(
-        {
-          listenInfos: [
-            {
-              protocol: "udp",
-              ip: "0.0.0.0",
-              // = public address, if needed
-              // announcedAddress: "88.12.10.41",
-            },
-          ],
-          // enableUdp: true,
-          // enableTcp: true,
-          // preferUdp: true,
-        },
-      );
+  createServerWebRtcTransport: publicProcedure.mutation(async ({ ctx }) => {
+    const clientUuid = ctx.sessionId;
+    const { router } = await mediasoupServerPromise;
+    const webRtcTransport = await router.createWebRtcTransport(
+      {
+        listenInfos: [
+          {
+            protocol: "udp",
+            ip: "0.0.0.0",
+            // = public address, if needed
+            // announcedAddress: "88.12.10.41",
+          },
+        ],
+        // enableUdp: true,
+        // enableTcp: true,
+        // preferUdp: true,
+      },
+    );
 
-      // store webRtcTransport for this client
-      const client = connectedClients.get(input.clientUuid);
-      if (!client) {
-        logger.error(`Client not found: ${input.clientUuid}`);
-        return;
-      }
+    // store webRtcTransport for this client
+    const client = connectedClients.get(clientUuid);
+    if (!client) {
+      logger.error(`Client not found: ${clientUuid}`);
+      return;
+    }
 
-      client.transports.push(webRtcTransport);
+    client.transports.push(webRtcTransport);
 
-      const transportOptions = {
-        id: webRtcTransport.id,
-        iceParameters: webRtcTransport.iceParameters,
-        iceCandidates: webRtcTransport.iceCandidates,
-        dtlsParameters: webRtcTransport.dtlsParameters,
-      } satisfies TransportOptions;
+    const transportOptions = {
+      id: webRtcTransport.id,
+      iceParameters: webRtcTransport.iceParameters,
+      iceCandidates: webRtcTransport.iceCandidates,
+      dtlsParameters: webRtcTransport.dtlsParameters,
+    } satisfies TransportOptions;
 
-      return {
-        transportId: webRtcTransport.id,
-        transportOptions,
-      };
-    }),
+    return {
+      transportId: webRtcTransport.id,
+      transportOptions,
+    };
+  }),
 
   // Step 3: connectWebRtcTransport
   connectWebRtcTransport: publicProcedure.input(z.object({
-    clientUuid: z.string(),
     transportId: z.string(),
     // TODO: check typing against DtlsParameters of mediasoup-client
     dtlsParameters: z.any(),
-  })).mutation(async ({ input }) => {
-    const client = connectedClients.get(input.clientUuid);
+  })).mutation(async ({ input, ctx }) => {
+    const clientUuid = ctx.sessionId;
+    const client = connectedClients.get(clientUuid);
 
     const transport = client?.transports.find(
       (t) => t.id === input.transportId,
@@ -113,18 +111,18 @@ export const trpcRouter = router({
 
   // Step 4: createProducer
   createProducer: publicProcedure.input(z.object({
-    clientUuid: z.string(),
     transportId: z.string(),
     kind: z.enum(["audio", "video"]),
     rtpParameters: z.any(),
     appData: z.any(),
-  })).mutation(async ({ input }) => {
-    const client = connectedClients.get(input.clientUuid);
+  })).mutation(async ({ input, ctx }) => {
+    const clientUuid = ctx.sessionId;
+    const client = connectedClients.get(clientUuid);
     if (!client) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message:
-          `Cannot create producer, client not found for client id: ${input.clientUuid}`,
+          `Cannot create producer, client not found for client id: ${clientUuid}`,
       });
     }
 
