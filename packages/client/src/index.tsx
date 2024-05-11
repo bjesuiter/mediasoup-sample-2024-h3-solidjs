@@ -9,6 +9,7 @@ import App from './App';
 import {ErrorPage404} from './features/pages/404.page';
 import {SendPage} from './features/send-audio/send.page';
 import {ReceivePage} from './features/receive-audio/receive.page';
+import {SendTrpcPage} from './features/pages/send-trpc.page';
 
 const root = document.getElementById('root');
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ render(
 		<QueryClientProvider client={queryClient}>
 			<Router root={App}>
 				<Route path="send" component={SendPage}></Route>
+				<Route path="send-trpc" component={SendTrpcPage}></Route>
 				<Route path="receive" component={ReceivePage}></Route>
 				<Route path="*404" component={ErrorPage404} />
 			</Router>

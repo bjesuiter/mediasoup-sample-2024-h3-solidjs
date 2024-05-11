@@ -17,6 +17,7 @@ const App = (props: any) => {
 			<nav style="display: flex; flex-flow: row nowrap; gap: 24px;">
 				<a href="/send">Send Page</a>
 				<a href="/receive">Receive Page</a>
+				<a href="/send-trpc">Send TRPC Page</a>
 			</nav>
 
 			<div class="hr" />
