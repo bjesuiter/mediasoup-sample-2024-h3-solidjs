@@ -6,6 +6,15 @@ import { logger } from "../utils/logger";
 import { publicProcedure, router } from "./trpc.base";
 import { z } from "zod";
 
+import type {
+  AppData,
+  DtlsParameters,
+  MediaKind,
+  RtpCapabilities,
+  RtpParameters,
+  TransportOptions,
+} from "mediasoup-client/lib/types";
+
 export const trpcRouter = router({
   ping: publicProcedure.query(() => "pong"),
 
@@ -58,6 +67,18 @@ export const trpcRouter = router({
       }
 
       client.transports.push(webRtcTransport);
+
+      const transportOptions = {
+        id: webRtcTransport.id,
+        iceParameters: webRtcTransport.iceParameters,
+        iceCandidates: webRtcTransport.iceCandidates,
+        dtlsParameters: webRtcTransport.dtlsParameters,
+      } satisfies TransportOptions;
+
+      return {
+        transportId: webRtcTransport.id,
+        transportOptions,
+      };
     }),
 });
 
