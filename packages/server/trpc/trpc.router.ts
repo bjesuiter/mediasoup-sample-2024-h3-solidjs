@@ -1,5 +1,5 @@
 import { mediasoupServerPromise } from "../mediasoup/mediasoupServer";
-import { publicProcedure, router } from "./trpc";
+import { publicProcedure, router } from "./trpc.base";
 
 export const appRouter = router({
   // e.g. /ping
