@@ -3,6 +3,7 @@ import {trpcClient} from '../../trpc/trpc-client';
 import * as mediasoupClient from 'mediasoup-client';
 import {AudioDeviceSelector} from './AudioDeviceSelector';
 import {ProducerOptions} from 'mediasoup-client/lib/types';
+import {send} from 'vite';
 
 export function SendTrpcPage() {
 	// Step 0: Connect with the server which assigns a new clientUuid (aka sessionId)
@@ -92,7 +93,11 @@ export function SendTrpcPage() {
 				} catch (error: unknown) {
 					errback(
 						new Error(
-							`Error while sending DTLS parameters: ${JSON.stringify(error, undefined, '\t')}`
+							`Error while creating Producer: ${JSON.stringify(
+								(error as any).data,
+								undefined,
+								'\t'
+							)}`
 						)
 					);
 				}
@@ -106,14 +111,22 @@ export function SendTrpcPage() {
 	// Step 6: Create a media track (set by a component in the template)
 	const [stream, setStream] = createSignal<MediaStream | undefined>();
 
+	const [sendTransportUsed, setSendTransportUsed] = createSignal(false);
+
 	// Step 7: Create a producer
 	const [producer] = createResource(
 		() => ({
 			sendTransport: sendTransport(),
 			stream: stream(),
+			sendTransportUsed: sendTransportUsed(),
 		}),
-		async ({sendTransport, stream}) => {
+		async ({sendTransport, stream, sendTransportUsed}) => {
 			if (!sendTransport || !stream) return;
+
+			if (sendTransportUsed) {
+				console.warn('Step 7: Producer already created');
+				return;
+			}
 
 			const audioTrack = stream.getAudioTracks()[0];
 			console.log('Step 7: audioTrack', audioTrack);
@@ -131,6 +144,7 @@ export function SendTrpcPage() {
 			} satisfies ProducerOptions;
 
 			const producer = await sendTransport.produce(options);
+			setSendTransportUsed(true);
 
 			console.log('Step 7: Finished producer', producer);
 			return producer;
@@ -139,9 +153,9 @@ export function SendTrpcPage() {
 
 	// debug effect to force recomputation of resources
 	createEffect(() => {
-		device();
-		clientUuid();
-		sendTransport();
+		// device();
+		// clientUuid();
+		// sendTransport();
 		producer();
 	});
 
