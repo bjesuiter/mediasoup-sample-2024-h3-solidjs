@@ -3,10 +3,18 @@ import { createContext } from "../trpc/trpc.base";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import { trpcRouter } from "../trpc/trpc.router";
 import cors from "cors";
+import session from "express-session";
 
 export const expressApp = express();
 
-expressApp.use(cors());
+expressApp.use(cors({ origin: "http://localhost:8000", credentials: true }));
+
+// https://www.npmjs.com/package/express-session
+expressApp.use(session({
+  secret: "my-secret",
+  // only use cookies via https
+  cookie: { secure: false },
+}));
 
 expressApp.use(
   "/trpc",
