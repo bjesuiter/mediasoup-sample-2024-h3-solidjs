@@ -164,6 +164,17 @@ export function ReceiveTrpcPage() {
 		}
 	});
 
+	async function playAudio() {
+		consumer()?.resume();
+		const consumerId = consumer()?.id;
+		if (!consumerId) {
+			console.error('Consumer not created, cannot play audio');
+			return;
+		}
+		await trpcClient.resumeConsumer.mutate({consumerId});
+		audioElement.play();
+	}
+
 	return (
 		<div>
 			<h1>Receive Audio (with trpc + mediasoup)</h1>
@@ -193,6 +204,7 @@ export function ReceiveTrpcPage() {
 
 			<fieldset>
 				<legend>Player</legend>
+				<button onClick={playAudio}>Play</button>
 				<audio controls ref={audioElement}></audio>
 			</fieldset>
 		</div>

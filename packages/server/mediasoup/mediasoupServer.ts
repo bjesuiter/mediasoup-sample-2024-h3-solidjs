@@ -26,6 +26,11 @@ export const producers = new Map<
   mediasoup.types.Producer<mediasoup.types.AppData>
 >();
 
+export const consumers = new Map<
+  string,
+  mediasoup.types.Consumer<mediasoup.types.AppData>
+>();
+
 async function runMediasoupServer() {
   const mediaCodecs = [
     {

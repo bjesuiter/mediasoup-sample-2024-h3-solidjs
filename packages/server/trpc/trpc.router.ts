@@ -1,5 +1,6 @@
 import {
   connectedClients,
+  consumers,
   mediasoupServerPromise,
   producers,
 } from "../mediasoup/mediasoupServer";
@@ -261,6 +262,7 @@ export const trpcRouter = router({
         rtpCapabilities: input.deviceRtpCapabilities,
         paused: true,
       });
+      consumers.set(consumer.id, consumer);
 
       // Generate consumer options for the client
       const consumerOptions = {
@@ -273,6 +275,22 @@ export const trpcRouter = router({
 
       return consumerOptions;
     }),
+
+  resumeConsumer: publicProcedure.input(z.object({
+    consumerId: z.string(),
+  })).mutation(async ({ input }) => {
+    const consumer = consumers.get(input.consumerId);
+
+    if (!consumer) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message:
+          `Cannot resume consumer, consumer not found for consumer id: ${input.consumerId}`,
+      });
+    }
+
+    await consumer.resume();
+  }),
 });
 
 // Export type router type signature,
