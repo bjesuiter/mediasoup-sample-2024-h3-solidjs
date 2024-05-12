@@ -117,19 +117,20 @@ export function SendTrpcPage() {
 	// Step 6: Create a media track (set by a component in the template)
 	const [stream, setStream] = createSignal<MediaStream | undefined>();
 
-	const [sendTransportUsed, setSendTransportUsed] = createSignal(false);
+	const [producerAlreadyCreated, setSendTransportUsed] = createSignal(false);
 
 	// Step 7: Create a producer
 	const [producer] = createResource(
 		() => ({
 			sendTransport: sendTransport(),
 			stream: stream(),
-			sendTransportUsed: sendTransportUsed(),
+			producerAlreadyCreated: producerAlreadyCreated(),
 		}),
-		async ({sendTransport, stream, sendTransportUsed}) => {
+		async ({sendTransport, stream, producerAlreadyCreated: sendTransportUsed}) => {
 			if (!sendTransport || !stream) return;
 
 			if (sendTransportUsed) {
+				// TODO: Fix that this method is called multiple times with sendTransport and stream when i not check this producerAlreadyCreated check
 				console.warn('Step 7: Producer already created');
 				return;
 			}
