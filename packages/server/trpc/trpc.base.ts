@@ -2,33 +2,14 @@ import { initTRPC } from "@trpc/server";
 import * as express from "express";
 import { getCookie, setCookie } from "./cookie-utils";
 import type { CookieSerializeOptions } from "cookie";
-import { connectedClients } from "../mediasoup/mediasoupServer";
-import { logger } from "../utils/logger";
+import { retrieveSession } from "../utils/session";
 
 // Factory for trpc context for 'express' adapter - created per request
 export const createContext = ({
   req,
   res,
 }: { req: express.Request; res: express.Response }) => {
-  // session management
-  let sessionId = getCookie(req, "clientUuid");
-  if (!sessionId) {
-    // init new session
-    const newSessionId = crypto.randomUUID();
-    logger.debug(`New session created: ${newSessionId}`);
-    setCookie(res, "clientUuid", newSessionId);
-    sessionId = newSessionId;
-  }
-
-  // init new client with empty transports
-  if (sessionId && !connectedClients.has(sessionId)) {
-    connectedClients.set(sessionId, {
-      transports: [],
-    });
-    logger.debug(`New connectedClient initialized for session: ${sessionId}`);
-  }
-
-  const connectedClient = connectedClients.get(sessionId);
+  const { sessionId, connectedClient } = retrieveSession(req, res);
 
   return {
     // req,
