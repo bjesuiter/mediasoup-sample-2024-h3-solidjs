@@ -65,7 +65,9 @@ export const trpcRouter = router({
     // store webRtcTransport for this client
     const client = connectedClients.get(clientUuid);
     if (!client) {
-      logger.error(`Client not found: ${clientUuid}`);
+      logger.error(
+        `Cannot create webRtcTransport: Client Session not found: ${clientUuid}`,
+      );
       return;
     }
 
@@ -122,7 +124,7 @@ export const trpcRouter = router({
       throw new TRPCError({
         code: "NOT_FOUND",
         message:
-          `Cannot create producer, client not found for client id: ${clientUuid}`,
+          `Cannot create producer, client session not found for client id: ${clientUuid}`,
       });
     }
 
