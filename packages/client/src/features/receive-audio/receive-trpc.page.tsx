@@ -149,9 +149,7 @@ export function ReceiveTrpcPage() {
 		}),
 		async ({consumer}) => {
 			if (!consumer) return;
-
-			const stream = new MediaStream();
-			stream.addTrack(consumer.track);
+			const stream = new MediaStream([consumer.track]);
 
 			return stream;
 		}
