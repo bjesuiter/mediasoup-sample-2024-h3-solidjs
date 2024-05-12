@@ -17,19 +17,23 @@ export function SendTrpcPage() {
 	const clientUuidAvailable = () => clientUuid() !== undefined;
 
 	// Step 1: Get ServerRtpCapabilities
-	const [serverRtpCapabilities] = createResource(async () => {
-		const serverRtpCapabilities = await trpcClient.getServerRtpCapabilities.query();
-		console.log('Step 1: serverRtpCapabilities', serverRtpCapabilities);
-		return serverRtpCapabilities;
-	});
+	const [serverRtpCapabilities] = createResource(
+		() => clientUuidAvailable(),
+		async () => {
+			const serverRtpCapabilities = await trpcClient.getServerRtpCapabilities.query();
+			console.log('Step 1: serverRtpCapabilities', serverRtpCapabilities);
+			return serverRtpCapabilities;
+		}
+	);
 
 	// Step 2 & 3: Create device and load serverRtpCapabilities into it
 	const [device] = createResource(
 		() => ({
+			clientUuidAvailable: clientUuidAvailable(),
 			serverRtpCaps: serverRtpCapabilities(),
 		}),
 		async ({serverRtpCaps}) => {
-			if (!serverRtpCaps) return;
+			if (!serverRtpCaps || !clientUuidAvailable) return;
 
 			// Step 3: Create a device
 			const device = new mediasoupClient.Device();

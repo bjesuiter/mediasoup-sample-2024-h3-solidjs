@@ -1,12 +1,12 @@
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
+import { createTRPCProxyClient, httpLink } from "@trpc/client";
 import type { TrpcRouter } from "server/trpc/trpc.router";
-//     👆 **type-only** import of trpc app router
 
 // Pass AppRouter as generic here. 👇 This lets the `trpc` object know
 // what procedures are available on the server and their input/output types.
 export const trpcClient = createTRPCProxyClient<TrpcRouter>({
   links: [
-    httpBatchLink({
+    // using httpLink instead of httpBatchLink, since httpBatchLink seems to produce duplicated session ids on the server
+    httpLink({
       url: "http://localhost:4000/trpc",
       fetch(url, options) {
         return fetch(url, {

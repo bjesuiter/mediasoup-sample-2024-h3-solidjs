@@ -2,18 +2,26 @@ import { initTRPC } from "@trpc/server";
 import * as express from "express";
 import { getCookie, setCookie } from "./cookie-utils";
 import type { CookieSerializeOptions } from "cookie";
+import { logger } from "../utils/logger";
 
 // Factory for trpc context for 'express' adapter - created per request
 export const createContext = ({
   req,
   res,
 }: { req: express.Request; res: express.Response }) => {
-  const sessionId = req.sessionID;
+  logger.debug(`New Request in trpc: `, {
+    url: req.url,
+    sessionId: req.sessionID,
+    // sessionDotId: req.session.id,
+    // sessionCookie: req.session.cookie,
+    sessionCookieManualRead: getCookie(req, "connect.sid"),
+  });
 
   return {
     // req,
     // res,
-    sessionId,
+    session: req.session,
+    sessionId: req.sessionID,
     getCookie: (name: string) => getCookie(req, name),
     setCookie: (
       name: string,

@@ -31,6 +31,7 @@ export const trpcRouter = router({
     connectedClients.set(ctx.sessionId, {
       transports: [],
     });
+    ctx.session.save();
     logger.info(`New client connected: ${ctx.sessionId}`);
 
     return ctx.sessionId;
@@ -44,6 +45,7 @@ export const trpcRouter = router({
 
   // Step 2 for sending: createWebRtcTransport
   createServerWebRtcTransport: publicProcedure.mutation(async ({ ctx }) => {
+    logger.debug(`Received createServerWebRtcTransport request`);
     const clientUuid = ctx.sessionId;
     const { router } = await mediasoupServerPromise;
     const webRtcTransport = await router.createWebRtcTransport(
