@@ -123,12 +123,6 @@ export const ReceivePage: Component = () => {
 	return (
 		<div>
 			<h1>Receive Audio</h1>
-			ProducerIds debug:
-			<ul>
-				{producerIds()?.map((id: string) => (
-					<li>{id}</li>
-				))}
-			</ul>
 		</div>
 	);
 };

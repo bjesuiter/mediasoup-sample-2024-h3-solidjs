@@ -155,6 +155,26 @@ export const trpcRouter = router({
       producerServerId: producer.id,
     };
   }),
+
+  // RECEIVER SIDE
+  getAvailableProducers: publicProcedure.query(async ({ ctx }) => {
+    const clientUuid = ctx.sessionId;
+    const client = connectedClients.get(clientUuid);
+    if (!client) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message:
+          `Cannot get available producers, client session not found for client id: ${clientUuid}`,
+      });
+    }
+
+    const availableProducers = Array.from(producers.values()).map((p) => ({
+      producerServerId: p.id,
+      kind: p.kind,
+    }));
+
+    return availableProducers;
+  }),
 });
 
 // Export type router type signature,
