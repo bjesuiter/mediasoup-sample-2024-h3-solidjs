@@ -149,7 +149,9 @@ export function ReceiveTrpcPage() {
 		}),
 		async ({consumer}) => {
 			if (!consumer) return;
+			console.debug('I have consumer', consumer);
 			const stream = new MediaStream([consumer.track]);
+			console.debug('I have stream', stream);
 			return stream;
 		}
 	);
@@ -157,11 +159,19 @@ export function ReceiveTrpcPage() {
 	// Step 8 Render Audio Stream
 
 	let audioElement!: HTMLAudioElement;
+	// let videoElement!: HTMLVideoElement;
 	createEffect(() => {
 		const stream = audioStream();
-		if (stream) {
-			audioElement.srcObject = stream;
+
+		if (!stream) {
+			console.error('No stream available');
+			return;
 		}
+
+		console.log('Step 8: Audio Stream', stream);
+
+		audioElement.srcObject = stream;
+		// videoElement.srcObject = stream;
 	});
 
 	async function playAudio() {
@@ -206,6 +216,7 @@ export function ReceiveTrpcPage() {
 				<legend>Player</legend>
 				<button onClick={playAudio}>Play</button>
 				<audio controls ref={audioElement}></audio>
+				{/* <video controls ref={videoElement}></video> */}
 			</fieldset>
 		</div>
 	);
