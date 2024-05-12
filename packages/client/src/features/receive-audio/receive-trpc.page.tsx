@@ -52,11 +52,49 @@ export function ReceiveTrpcPage() {
 	});
 
 	// Step 4: Create a transport for receiving audio
+	const [receiveTransport] = createResource(
+		() => ({
+			device: device(),
+			clientUuidAvailable: clientUuidAvailable(),
+			// producerIds: producerIds(),
+		}),
+		async ({device, clientUuidAvailable}) => {
+			if (!device || !clientUuidAvailable) return;
+
+			const serverTransport = await trpcClient.createServerWebRtcTransport.mutate();
+			if (!serverTransport) {
+				console.error(
+					`Server transport creation not successful - server returned undefined - probably error on server!`
+				);
+				return;
+			}
+
+			const receiveTransport = device.createRecvTransport(serverTransport.transportOptions);
+
+			receiveTransport.on('connect', async ({dtlsParameters}, callback, errback) => {
+				try {
+					await trpcClient.connectWebRtcTransport.mutate({
+						transportId: receiveTransport.id,
+						dtlsParameters,
+					});
+					// go on with client side processing of webrtc (for example: creating producers, etc.)
+					callback();
+				} catch (error) {
+					errback(
+						new Error(
+							`Error while sending DTLS parameters: ${JSON.stringify(error, undefined, '\t')}`
+						)
+					);
+				}
+			});
+		}
+	);
 
 	createEffect(() => {
 		serverRtpCapabilities();
 		deviceRtpCapabilities();
 		producerIds();
+		receiveTransport();
 	});
 
 	return (
