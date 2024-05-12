@@ -64,7 +64,6 @@ export function ReceiveTrpcPage() {
 		() => ({
 			device: device(),
 			clientUuidAvailable: clientUuidAvailable(),
-			// producerIds: producerIds(),
 		}),
 		async ({device, clientUuidAvailable}) => {
 			if (!device || !clientUuidAvailable) return;
@@ -129,16 +128,17 @@ export function ReceiveTrpcPage() {
 		async ({device, receiveTransport, selectedProducerId}) => {
 			if (!device || !receiveTransport || !selectedProducerId) return;
 
-			const serverConsumer = await trpcClient.createConsumer.mutate({
+			const serverConsumerOptions = await trpcClient.createConsumer.mutate({
 				transportId: receiveTransport.id,
 				selectedProducerId: selectedProducerId,
 				deviceRtpCapabilities: device.rtpCapabilities,
 			});
 
-			const deviceConsumer = await receiveTransport.consume(serverConsumer);
+			const deviceConsumer = await receiveTransport.consume({
+				...serverConsumerOptions,
+			});
 
 			console.log('Step 6: Consumer created', deviceConsumer);
-
 			return deviceConsumer;
 		}
 	);
@@ -150,7 +150,6 @@ export function ReceiveTrpcPage() {
 		async ({consumer}) => {
 			if (!consumer) return;
 			const stream = new MediaStream([consumer.track]);
-
 			return stream;
 		}
 	);

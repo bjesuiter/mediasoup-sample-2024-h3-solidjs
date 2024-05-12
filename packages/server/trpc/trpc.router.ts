@@ -6,6 +6,7 @@ import {
 import { logger } from "../utils/logger";
 import { publicProcedure, router } from "./trpc.base";
 import { z } from "zod";
+import type { ConsumerOptions } from "mediasoup-client/lib/types";
 
 import type {
   AppData,
@@ -261,7 +262,16 @@ export const trpcRouter = router({
         paused: true,
       });
 
-      return consumer;
+      // Generate consumer options for the client
+      const consumerOptions = {
+        id: consumer.id,
+        producerId: consumer.producerId,
+        kind: consumer.kind,
+        rtpParameters: consumer.rtpParameters,
+        appData: consumer.appData,
+      } satisfies ConsumerOptions;
+
+      return consumerOptions;
     }),
 });
 
