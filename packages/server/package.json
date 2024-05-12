@@ -4,7 +4,8 @@
 	"type": "module",
 	"scripts": {
 		"dev": "bunx listhen --ws -w index.ts",
-		"express": "DEBUG=mediasoup* tsx watch server.ts"
+		"express": "tsx watch server.ts",
+		"express-debug": "DEBUG=mediasoup* tsx watch server.ts"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
