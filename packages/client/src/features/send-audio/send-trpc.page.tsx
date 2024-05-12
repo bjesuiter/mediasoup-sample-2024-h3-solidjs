@@ -7,7 +7,7 @@ import {ProducerOptions} from 'mediasoup-client/lib/types';
 export function SendTrpcPage() {
 	// Step 0: Connect with the server which assigns a new clientUuid (aka sessionId)
 	const [clientUuid] = createResource(async () => {
-		const clientUuid = await trpcClient.connectClient.mutate();
+		const clientUuid = await trpcClient.getSessionId.query();
 		console.log('Step 2: Connected to server', {clientUuid});
 		return clientUuid;
 	});

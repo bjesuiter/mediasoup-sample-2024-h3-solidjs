@@ -20,21 +20,18 @@ import { TRPCError } from "@trpc/server";
 export const trpcRouter = router({
   ping: publicProcedure.query(() => "pong"),
 
-  // Step 0 for sending & receiving: connectClient
-  connectClient: publicProcedure.mutation(async ({ ctx }) => {
-    if (connectedClients.has(ctx.sessionId)) {
-      logger.info(`Known client reconnected: ${ctx.sessionId}`);
-      return ctx.sessionId;
-    }
+  // Step 0 for sending & receiving: connectClient - not needed right now
+  // connectClient: publicProcedure.mutation(async ({ ctx }) => {
+  //   if (connectedClients.has(ctx.sessionId)) {
+  //     logger.info(`Known client reconnected: ${ctx.sessionId}`);
+  //     return ctx.sessionId;
+  //   }
 
-    // init new client with empty transports
-    connectedClients.set(ctx.sessionId, {
-      transports: [],
-    });
-    logger.info(`New client connected: ${ctx.sessionId}`);
+  //   return ctx.sessionId;
+  // }),
 
-    return ctx.sessionId;
-  }),
+  // Util
+  getSessionId: publicProcedure.query(({ ctx }) => ctx.sessionId),
 
   // Step 1 for sending & receiving: getServerRtpCapabilities
   getServerRtpCapabilities: publicProcedure.query(async () => {
