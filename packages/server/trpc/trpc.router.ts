@@ -176,6 +176,7 @@ export const trpcRouter = router({
     return availableProducers;
   }),
 
+  // Utility function to check if a device can consume a producer
   canDeviceConsumeProducer: publicProcedure.input(z.object({
     selectedProducerId: z.string(),
     deviceRtpCapabilities: z.any(),
@@ -196,43 +197,71 @@ export const trpcRouter = router({
       rtpCapabilities: input.deviceRtpCapabilities,
     });
 
-    logger.debug(`Can device consume producer`, {
-      producerRtpCapabilities: producer.rtpParameters,
-      deviceRtpCapabilities: input.deviceRtpCapabilities,
-      canConsume: canConsume,
-    });
+    // logger.debug(`Can device consume producer`, {
+    //   producerRtpCapabilities: producer.rtpParameters,
+    //   deviceRtpCapabilities: input.deviceRtpCapabilities,
+    //   canConsume: canConsume,
+    // });
 
     return canConsume;
   }),
 
   createConsumer: publicProcedure.input(z.object({
-    connectToProducerId: z.string(),
+    selectedProducerId: z.string(),
+    transportId: z.string(),
     deviceRtpCapabilities: z.any(),
   }))
     .mutation(async ({ input, ctx }) => {
-      const producer = producers.get(input.connectToProducerId);
+      const producer = producers.get(input.selectedProducerId);
 
       if (!producer) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message:
-            `Cannot create consumer, producer not found for producer id: ${input.connectToProducerId}`,
+            `Cannot create consumer, producer not found for producer id: ${input.selectedProducerId}`,
         });
       }
 
       const { router } = await mediasoupServerPromise;
       const canConsume = router.canConsume({
-        producerId: input.connectToProducerId,
+        producerId: input.selectedProducerId,
         rtpCapabilities: input.deviceRtpCapabilities,
       });
 
-      logger.debug(`Can device consume producer`, {
-        producerRtpCapabilities: producer.rtpParameters,
-        deviceRtpCapabilities: input.deviceRtpCapabilities,
-        canConsume: canConsume,
+      // For deep dive debugging
+      // logger.debug(`Can device consume producer`, {
+      //   producerRtpCapabilities: producer.rtpParameters,
+      //   deviceRtpCapabilities: input.deviceRtpCapabilities,
+      //   canConsume: canConsume,
+      // });
+
+      if (!canConsume) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            `Cannot create consumer, device cannot consume producer with producerId: ${input.selectedProducerId}`,
+        });
+      }
+
+      const transport = connectedClients.get(ctx.sessionId)?.transports.find((
+        transport,
+      ) => transport.id === input.transportId);
+
+      if (!transport) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            `Cannot create consumer, transport not found for transport id: ${input.transportId}`,
+        });
+      }
+
+      const consumer = await transport.consume({
+        producerId: input.selectedProducerId,
+        rtpCapabilities: input.deviceRtpCapabilities,
+        paused: true,
       });
 
-      // TODO: create consumer
+      return consumer;
     }),
 });
 
