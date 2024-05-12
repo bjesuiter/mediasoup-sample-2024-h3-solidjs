@@ -18,6 +18,7 @@ const App = (props: any) => {
 				<a href="/send">Send Page</a>
 				<a href="/receive">Receive Page</a>
 				<a href="/send-trpc">Send TRPC Page</a>
+				<a href="/receive-trpc">Receive TRPC Page</a>
 			</nav>
 
 			<div class="hr" />
