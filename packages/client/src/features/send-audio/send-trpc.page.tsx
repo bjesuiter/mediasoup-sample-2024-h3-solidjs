@@ -11,6 +11,10 @@ export function SendTrpcPage() {
 		console.log('Step 2: Connected to server', {clientUuid});
 		return clientUuid;
 	});
+	// check if clientUuid is available - needed to extpress a dependency on clientUuid in other resources
+	// so that they wait for it to be available!
+	//  The sending of the id will happen via a cookie (since it's my session id)
+	const clientUuidAvailable = () => clientUuid() !== undefined;
 
 	// Step 1: Get ServerRtpCapabilities
 	const [serverRtpCapabilities] = createResource(async () => {
@@ -43,9 +47,10 @@ export function SendTrpcPage() {
 	const [sendTransport] = createResource(
 		() => ({
 			device: device(),
+			clientUuidAvailable: clientUuidAvailable(),
 		}),
-		async ({device}) => {
-			if (!device) return;
+		async ({device, clientUuidAvailable}) => {
+			if (!device || !clientUuidAvailable) return;
 
 			// will get clientUuid via sessionId in cookie
 			const serverTransport = await trpcClient.createServerWebRtcTransport.mutate();
