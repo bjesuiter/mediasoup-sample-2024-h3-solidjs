@@ -56,7 +56,9 @@ export function SendTrpcPage() {
 			const serverTransport = await trpcClient.createServerWebRtcTransport.mutate();
 
 			if (!serverTransport) {
-				console.error(`Server transport not created!`);
+				console.error(
+					`Server transport creation not successful - server returned undefined - probably error on server!`
+				);
 				return;
 			}
 

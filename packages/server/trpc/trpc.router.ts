@@ -140,12 +140,17 @@ export const trpcRouter = router({
     logger.debug(`Creating producer for transport: ${input.transportId}`);
 
     const producer = await transport.produce({
-      id: input.transportId,
+      id: crypto.randomUUID(),
       kind: input.kind,
       rtpParameters: input.rtpParameters as RtpParameters,
       appData: input.appData as AppData,
     });
     producers.set(producer.id, producer);
+
+    logger.debug(`Producer Created`, {
+      webRtcTransportId: input.transportId,
+      producerServerId: producer.id,
+    });
 
     return {
       producerServerId: producer.id,
