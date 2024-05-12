@@ -169,12 +169,71 @@ export const trpcRouter = router({
     }
 
     const availableProducers = Array.from(producers.values()).map((p) => ({
-      producerServerId: p.id,
+      id: p.id,
       kind: p.kind,
     }));
 
     return availableProducers;
   }),
+
+  canDeviceConsumeProducer: publicProcedure.input(z.object({
+    selectedProducerId: z.string(),
+    deviceRtpCapabilities: z.any(),
+  })).query(async ({ input }) => {
+    const producer = producers.get(input.selectedProducerId);
+
+    if (!producer) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message:
+          `Cannot create consumer, producer not found for producer id: ${input.connectToProducerId}`,
+      });
+    }
+
+    const { router } = await mediasoupServerPromise;
+    const canConsume = router.canConsume({
+      producerId: input.selectedProducerId,
+      rtpCapabilities: input.deviceRtpCapabilities,
+    });
+
+    logger.debug(`Can device consume producer`, {
+      producerRtpCapabilities: producer.rtpParameters,
+      deviceRtpCapabilities: input.deviceRtpCapabilities,
+      canConsume: canConsume,
+    });
+
+    return canConsume;
+  }),
+
+  createConsumer: publicProcedure.input(z.object({
+    connectToProducerId: z.string(),
+    deviceRtpCapabilities: z.any(),
+  }))
+    .mutation(async ({ input, ctx }) => {
+      const producer = producers.get(input.connectToProducerId);
+
+      if (!producer) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            `Cannot create consumer, producer not found for producer id: ${input.connectToProducerId}`,
+        });
+      }
+
+      const { router } = await mediasoupServerPromise;
+      const canConsume = router.canConsume({
+        producerId: input.connectToProducerId,
+        rtpCapabilities: input.deviceRtpCapabilities,
+      });
+
+      logger.debug(`Can device consume producer`, {
+        producerRtpCapabilities: producer.rtpParameters,
+        deviceRtpCapabilities: input.deviceRtpCapabilities,
+        canConsume: canConsume,
+      });
+
+      // TODO: create consumer
+    }),
 });
 
 // Export type router type signature,

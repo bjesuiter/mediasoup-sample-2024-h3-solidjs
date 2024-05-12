@@ -1,4 +1,4 @@
-import {createEffect, createResource} from 'solid-js';
+import {createEffect, createResource, createSignal} from 'solid-js';
 import {trpcClient} from '../../trpc/trpc-client';
 import * as mediasoupClient from 'mediasoup-client';
 
@@ -51,6 +51,8 @@ export function ReceiveTrpcPage() {
 		return response;
 	});
 
+	const [selectedProducerId, setSelectedProducerId] = createSignal<string | undefined>();
+
 	// Step 4: Create a transport for receiving audio
 	const [receiveTransport] = createResource(
 		() => ({
@@ -87,14 +89,56 @@ export function ReceiveTrpcPage() {
 					);
 				}
 			});
+
+			return receiveTransport;
 		}
 	);
+
+	// Step 5: Zwischenschritt - canConsume
+	const [canConsume] = createResource(
+		() => ({
+			selectedProducerId: selectedProducerId(),
+			deviceRtpCapabilities: deviceRtpCapabilities(),
+		}),
+		async ({selectedProducerId, deviceRtpCapabilities}) => {
+			if (!selectedProducerId || !deviceRtpCapabilities) return;
+
+			const response = await trpcClient.canDeviceConsumeProducer.query({
+				selectedProducerId,
+				deviceRtpCapabilities,
+			});
+
+			console.log('Step 5: canConsume', response);
+			return response;
+		}
+	);
+
+	// Step 6: Create a consumer for a selected producer
+	// const [consumer] = createResource(
+	// 	() => ({
+	// 		device: device(),
+	// 		receiveTransport: receiveTransport(),
+	// 		selectedProducerId: selectedProducerId(),
+	// 	}),
+	// 	async ({device, receiveTransport, selectedProducerId}) => {
+	// 		if (!device || !receiveTransport || !selectedProducerId) return;
+
+	// 		const response = await trpcClient.createConsumer.mutate({
+	// 			connectToProducerId: selectedProducerId,
+	// 			deviceRtpCapabilities: device.rtpCapabilities,
+	// 		});
+
+	// 		console.log('Step 6: Consumer created', response);
+	// 		return response;
+	// 	}
+	// );
 
 	createEffect(() => {
 		serverRtpCapabilities();
 		deviceRtpCapabilities();
 		producerIds();
 		receiveTransport();
+		canConsume();
 	});
 
 	return (
@@ -102,14 +146,26 @@ export function ReceiveTrpcPage() {
 			<h1>Receive Audio (with trpc + mediasoup)</h1>
 			<fieldset>
 				<legend>Available Producers</legend>
-				<ul style="list-style: none; display:flex; flex-flow: column nowrap; gap: 4px; padding: 0;">
+				<div style="display:flex; flex-flow: column nowrap; gap: 4px; padding: 0;">
 					{producerIds()?.map(producer => (
 						// <li style="border-bottom: 1px solid gray; padding: 4px;">
-						<li style="">
-							{producer.producerServerId} - Kind: {producer.kind}
-						</li>
+						<button style="" onclick={() => setSelectedProducerId(producer.id)}>
+							{producer.id} - Kind: {producer.kind}
+						</button>
 					))}
-				</ul>
+				</div>
+			</fieldset>
+
+			<fieldset>
+				<legend>Selected Producer</legend>
+				<div>
+					<p>Selected Producer: {selectedProducerId() ?? 'none'}</p>
+					<p>
+						{canConsume()
+							? 'This device can consume the selected stream'
+							: 'This device cannot consume the selected stream'}
+					</p>
+				</div>
 			</fieldset>
 		</div>
 	);
