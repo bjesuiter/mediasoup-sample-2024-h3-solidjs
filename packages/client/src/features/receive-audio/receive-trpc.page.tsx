@@ -51,7 +51,13 @@ export function ReceiveTrpcPage() {
 		return response;
 	});
 
-	const [selectedProducerId, setSelectedProducerId] = createSignal<string | undefined>();
+	const [selectedProducerId, setSelectedProducerId] = createSignal<string>();
+	createEffect(() => {
+		const availableProducers = producerIds() ?? [];
+		if (availableProducers.length > 0) {
+			setSelectedProducerId(availableProducers[0]?.id);
+		}
+	});
 
 	// Step 4: Create a transport for receiving audio
 	const [receiveTransport] = createResource(
@@ -114,31 +120,51 @@ export function ReceiveTrpcPage() {
 	);
 
 	// Step 6: Create a consumer for a selected producer
-	// const [consumer] = createResource(
-	// 	() => ({
-	// 		device: device(),
-	// 		receiveTransport: receiveTransport(),
-	// 		selectedProducerId: selectedProducerId(),
-	// 	}),
-	// 	async ({device, receiveTransport, selectedProducerId}) => {
-	// 		if (!device || !receiveTransport || !selectedProducerId) return;
+	const [consumer] = createResource(
+		() => ({
+			device: device(),
+			receiveTransport: receiveTransport(),
+			selectedProducerId: selectedProducerId(),
+		}),
+		async ({device, receiveTransport, selectedProducerId}) => {
+			if (!device || !receiveTransport || !selectedProducerId) return;
 
-	// 		const response = await trpcClient.createConsumer.mutate({
-	// 			connectToProducerId: selectedProducerId,
-	// 			deviceRtpCapabilities: device.rtpCapabilities,
-	// 		});
+			const serverConsumer = await trpcClient.createConsumer.mutate({
+				transportId: receiveTransport.id,
+				selectedProducerId: selectedProducerId,
+				deviceRtpCapabilities: device.rtpCapabilities,
+			});
 
-	// 		console.log('Step 6: Consumer created', response);
-	// 		return response;
-	// 	}
-	// );
+			const deviceConsumer = await receiveTransport.consume(serverConsumer);
 
+			console.log('Step 6: Consumer created', deviceConsumer);
+
+			return deviceConsumer;
+		}
+	);
+
+	const [audioStream] = createResource(
+		() => ({
+			consumer: consumer(),
+		}),
+		async ({consumer}) => {
+			if (!consumer) return;
+
+			const stream = new MediaStream();
+			stream.addTrack(consumer.track);
+
+			return stream;
+		}
+	);
+
+	// Step 8 Render Audio Stream
+
+	let audioElement!: HTMLAudioElement;
 	createEffect(() => {
-		serverRtpCapabilities();
-		deviceRtpCapabilities();
-		producerIds();
-		receiveTransport();
-		canConsume();
+		const stream = audioStream();
+		if (stream) {
+			audioElement.srcObject = stream;
+		}
 	});
 
 	return (
@@ -166,6 +192,11 @@ export function ReceiveTrpcPage() {
 							: 'This device cannot consume the selected stream'}
 					</p>
 				</div>
+			</fieldset>
+
+			<fieldset>
+				<legend>Player</legend>
+				<audio controls ref={audioElement}></audio>
 			</fieldset>
 		</div>
 	);
