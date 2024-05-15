@@ -1,15 +1,5 @@
 # server
 
-To install dependencies:
+## For Debugging:
 
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.1.7. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+Compare Sample Implementation with my own: https://github.com/versatica/mediasoup-demo/blob/v3/server/server.js
