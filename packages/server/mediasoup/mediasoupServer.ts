@@ -64,6 +64,8 @@ async function runMediasoupServer() {
       // 'simulcast',
       // 'svc'
     ],
+    dtlsCertificateFile: "./assets/dev_cert/cert.pem",
+    dtlsPrivateKeyFile: "./assets/dev_cert/key.pem",
     rtcMinPort: 10000,
     rtcMaxPort: 10100,
   });

@@ -5,7 +5,8 @@
 	"scripts": {
 		"dev": "bunx listhen --ws -w index.ts",
 		"express": "tsx watch server.ts",
-		"express-debug": "DEBUG=mediasoup* tsx watch server.ts"
+		"express-debug": "DEBUG=mediasoup* tsx watch server.ts",
+		"generate-self-signed-cert": "openssl req -x509 -newkey rsa:4096 -nodes -days 365 -keyout assets/dev_cert/key.pem -out assets/dev_cert/cert.pem"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
