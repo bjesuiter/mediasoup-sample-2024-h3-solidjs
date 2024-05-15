@@ -2,10 +2,7 @@ import * as mediasoup from "mediasoup";
 import type { RtpCodecCapability } from "mediasoup/node/lib/types";
 import process from "node:process";
 
-export const mediasoupServerPromise: Promise<{
-  router: mediasoup.types.Router<mediasoup.types.AppData>;
-  worker: mediasoup.types.Worker<mediasoup.types.AppData>;
-}> = runMediasoupServer();
+export const mediasoupServerPromise = runMediasoupServer();
 
 // Map of websocket peers with their webrtc transports
 export const peerList = new Map<
@@ -112,12 +109,14 @@ async function runMediasoupServer() {
 
   const router = await worker.createRouter({ mediaCodecs });
 
-  const server = await worker.createWebRtcServer({
+  const webRtcServer = await worker.createWebRtcServer({
     listenInfos: [
       {
         protocol: "udp",
-        ip: process.env.MEDIASOUP_LISTEN_IP || "0.0.0.0",
-        announcedAddress: process.env.MEDIASOUP_ANNOUNCED_IP,
+        ip: "127.0.0.1",
+        announcedAddress: "",
+        // ip: process.env.MEDIASOUP_LISTEN_IP || "0.0.0.0",
+        // announcedAddress: process.env.MEDIASOUP_ANNOUNCED_IP,
         port: 44444,
       },
       {
@@ -134,7 +133,7 @@ async function runMediasoupServer() {
   // Now you can use the router to create WebRtcTransports, produce media, etc.
   return {
     worker,
-    server,
+    webRtcServer,
     router,
   };
 }

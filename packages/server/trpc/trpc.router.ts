@@ -44,17 +44,11 @@ export const trpcRouter = router({
   // Step 2 for sending: createWebRtcTransport
   createServerWebRtcTransport: publicProcedure.mutation(async ({ ctx }) => {
     const clientUuid = ctx.sessionId;
-    const { router } = await mediasoupServerPromise;
+    const { router, webRtcServer } = await mediasoupServerPromise;
     const webRtcTransport = await router.createWebRtcTransport(
       {
-        listenInfos: [
-          {
-            protocol: "udp",
-            ip: "0.0.0.0",
-            // = public address, if needed
-            // announcedAddress: "88.12.10.41",
-          },
-        ],
+        // listening ip and port etc. are set on the webRtcServer
+        webRtcServer: webRtcServer,
         /**
          * Enables User Datagram Protocol (UDP) for the transport.
          * UDP is often preferred for real-time media due to its lower latency compared to TCP.
@@ -70,6 +64,15 @@ export const trpcRouter = router({
          * Helps ensure lower latency if both protocols are enabled.
          */
         preferUdp: true,
+
+        // copied from example: https://github.com/versatica/mediasoup-demo/blob/210109ac6e039bbdc21d7d210a0457f090c05a4e/server/lib/Room.js
+        iceConsentTimeout: 20,
+        enableSctp: false,
+
+        // copied from: https://github.com/versatica/mediasoup-demo/blob/v3/server/config.example.js
+        initialAvailableOutgoingBitrate: 1000000,
+        maxSctpMessageSize: 262144,
+        // minimumAvailableOutgoingBitrate: 600000,
       },
     );
 
