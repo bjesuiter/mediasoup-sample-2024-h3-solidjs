@@ -7,7 +7,12 @@ import session from "express-session";
 
 export const expressApp = express();
 
-expressApp.use(cors({ origin: "http://localhost:8000", credentials: true }));
+expressApp.use(
+  cors({
+    origin: ["http://localhost:8000", "http://192.168.204.244:8000"],
+    credentials: true,
+  }),
+);
 
 // https://www.npmjs.com/package/express-session
 expressApp.use(session({

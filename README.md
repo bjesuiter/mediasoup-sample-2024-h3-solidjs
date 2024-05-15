@@ -1,15 +1,5 @@
 # mediasoup-sample-2024-h3-solidjs
 
-To install dependencies:
+## Next Todos
 
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.1.7. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+- try connecting to the producer from a phone or tablet

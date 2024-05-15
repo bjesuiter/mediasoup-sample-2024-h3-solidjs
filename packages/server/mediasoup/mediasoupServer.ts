@@ -109,22 +109,23 @@ async function runMediasoupServer() {
 
   const router = await worker.createRouter({ mediaCodecs });
 
+  // announcedAddress is the WLAN IP of my Mac in Zephir UniFi network
   const webRtcServer = await worker.createWebRtcServer({
     listenInfos: [
       {
         protocol: "udp",
-        ip: "127.0.0.1",
-        announcedAddress: "",
+        ip: "0.0.0.0",
+        announcedAddress: "192.168.204.244",
         // ip: process.env.MEDIASOUP_LISTEN_IP || "0.0.0.0",
         // announcedAddress: process.env.MEDIASOUP_ANNOUNCED_IP,
         port: 44444,
       },
       {
         protocol: "tcp",
-        ip: "127.0.0.1",
+        ip: "0.0.0.0",
         // ip: process.env.MEDIASOUP_LISTEN_IP || "0.0.0.0",
         // announcedAddress: process.env.MEDIASOUP_ANNOUNCED_IP,
-        announcedAddress: "",
+        announcedAddress: "192.168.204.244",
         port: 44444,
       },
     ],
