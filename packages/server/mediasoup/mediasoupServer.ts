@@ -1,4 +1,5 @@
 import * as mediasoup from "mediasoup";
+import type { RtpCodecCapability } from "mediasoup/node/lib/types";
 import process from "node:process";
 
 export const mediasoupServerPromise: Promise<{
@@ -31,23 +32,57 @@ export const consumers = new Map<
   mediasoup.types.Consumer<mediasoup.types.AppData>
 >();
 
+// Extend later for scaling up
+// export const mediasoupWorkers: Array<Worker<AppData>> = [];
+
 async function runMediasoupServer() {
   const mediaCodecs = [
     {
-      kind: "audio" as const,
+      kind: "audio",
       mimeType: "audio/opus",
       clockRate: 48000,
       channels: 2,
     },
     {
-      kind: "video" as const,
+      kind: "video",
       mimeType: "video/VP8",
       clockRate: 90000,
       parameters: {
         "x-google-start-bitrate": 1000,
       },
     },
-  ];
+    {
+      kind: "video",
+      mimeType: "video/VP9",
+      clockRate: 90000,
+      parameters: {
+        "profile-id": 2,
+        "x-google-start-bitrate": 1000,
+      },
+    },
+    {
+      kind: "video",
+      mimeType: "video/h264",
+      clockRate: 90000,
+      parameters: {
+        "packetization-mode": 1,
+        "profile-level-id": "4d0032",
+        "level-asymmetry-allowed": 1,
+        "x-google-start-bitrate": 1000,
+      },
+    },
+    {
+      kind: "video",
+      mimeType: "video/h264",
+      clockRate: 90000,
+      parameters: {
+        "packetization-mode": 1,
+        "profile-level-id": "42e01f",
+        "level-asymmetry-allowed": 1,
+        "x-google-start-bitrate": 1000,
+      },
+    },
+  ] satisfies RtpCodecCapability[];
 
   const worker = await mediasoup.createWorker({
     logLevel: "warn",
@@ -77,9 +112,29 @@ async function runMediasoupServer() {
 
   const router = await worker.createRouter({ mediaCodecs });
 
+  const server = await worker.createWebRtcServer({
+    listenInfos: [
+      {
+        protocol: "udp",
+        ip: process.env.MEDIASOUP_LISTEN_IP || "0.0.0.0",
+        announcedAddress: process.env.MEDIASOUP_ANNOUNCED_IP,
+        port: 44444,
+      },
+      {
+        protocol: "tcp",
+        ip: "127.0.0.1",
+        // ip: process.env.MEDIASOUP_LISTEN_IP || "0.0.0.0",
+        // announcedAddress: process.env.MEDIASOUP_ANNOUNCED_IP,
+        announcedAddress: "",
+        port: 44444,
+      },
+    ],
+  });
+
   // Now you can use the router to create WebRtcTransports, produce media, etc.
   return {
-    router,
     worker,
+    server,
+    router,
   };
 }
