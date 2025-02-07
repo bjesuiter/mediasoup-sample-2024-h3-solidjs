@@ -10,8 +10,7 @@
 		"generate-self-signed-cert": "openssl req -x509 -newkey rsa:4096 -nodes -days 365 -keyout assets/dev_cert/key.pem -out assets/dev_cert/cert.pem"
 	},
 	"devDependencies": {
-		"@types/bun": "latest",
-		"nx": "^18.3.4"
+		"@types/bun": "latest"
 	},
 	"peerDependencies": {
 		"typescript": "^5.0.0"
