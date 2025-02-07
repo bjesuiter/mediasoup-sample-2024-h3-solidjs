@@ -115,7 +115,7 @@ async function runMediasoupServer() {
       {
         protocol: "udp",
         ip: "0.0.0.0",
-        announcedAddress: "192.168.204.244",
+        // announcedAddress: "192.168.204.244",
         // ip: process.env.MEDIASOUP_LISTEN_IP || "0.0.0.0",
         // announcedAddress: process.env.MEDIASOUP_ANNOUNCED_IP,
         port: 44444,
@@ -125,7 +125,9 @@ async function runMediasoupServer() {
         ip: "0.0.0.0",
         // ip: process.env.MEDIASOUP_LISTEN_IP || "0.0.0.0",
         // announcedAddress: process.env.MEDIASOUP_ANNOUNCED_IP,
-        announcedAddress: "192.168.204.244",
+        // bjesuiter: Not providing abounded address should work if all clients can resolve the LAN IP of the Laptop. 
+        // we only need that for clients outside of LAN or with NAT traversal
+        //announcedAddress: "192.168.204.244",
         port: 44444,
       },
     ],
