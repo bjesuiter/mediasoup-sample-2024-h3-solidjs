@@ -4,15 +4,19 @@
   "private": true,
   "devDependencies": {
     "@types/bun": "latest",
-    "typescript": "^5.4.5"
+    "typescript": "^5.7.3"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.7.3"
   },
   "workspaces": [
     "packages/*"
   ],
   "dependencies": {
     "@trpc/server": "^10.45.2"
-  }
+  },
+  "trustedDependencies": [
+    "esbuild",
+    "nx"
+  ]
 }
