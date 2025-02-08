@@ -37,45 +37,46 @@ async function runMediasoupServer() {
 			clockRate: 48000,
 			channels: 2,
 		},
-		{
-			kind: 'video',
-			mimeType: 'video/VP8',
-			clockRate: 90000,
-			parameters: {
-				'x-google-start-bitrate': 1000,
-			},
-		},
-		{
-			kind: 'video',
-			mimeType: 'video/VP9',
-			clockRate: 90000,
-			parameters: {
-				'profile-id': 2,
-				'x-google-start-bitrate': 1000,
-			},
-		},
-		{
-			kind: 'video',
-			mimeType: 'video/h264',
-			clockRate: 90000,
-			parameters: {
-				'packetization-mode': 1,
-				'profile-level-id': '4d0032',
-				'level-asymmetry-allowed': 1,
-				'x-google-start-bitrate': 1000,
-			},
-		},
-		{
-			kind: 'video',
-			mimeType: 'video/h264',
-			clockRate: 90000,
-			parameters: {
-				'packetization-mode': 1,
-				'profile-level-id': '42e01f',
-				'level-asymmetry-allowed': 1,
-				'x-google-start-bitrate': 1000,
-			},
-		},
+		// @bjesuiter: Disable all video codecs since we only need audio for now
+		// {
+		// 	kind: 'video',
+		// 	mimeType: 'video/VP8',
+		// 	clockRate: 90000,
+		// 	parameters: {
+		// 		'x-google-start-bitrate': 1000,
+		// 	},
+		// },
+		// {
+		// 	kind: 'video',
+		// 	mimeType: 'video/VP9',
+		// 	clockRate: 90000,
+		// 	parameters: {
+		// 		'profile-id': 2,
+		// 		'x-google-start-bitrate': 1000,
+		// 	},
+		// },
+		// {
+		// 	kind: 'video',
+		// 	mimeType: 'video/h264',
+		// 	clockRate: 90000,
+		// 	parameters: {
+		// 		'packetization-mode': 1,
+		// 		'profile-level-id': '4d0032',
+		// 		'level-asymmetry-allowed': 1,
+		// 		'x-google-start-bitrate': 1000,
+		// 	},
+		// },
+		// {
+		// 	kind: 'video',
+		// 	mimeType: 'video/h264',
+		// 	clockRate: 90000,
+		// 	parameters: {
+		// 		'packetization-mode': 1,
+		// 		'profile-level-id': '42e01f',
+		// 		'level-asymmetry-allowed': 1,
+		// 		'x-google-start-bitrate': 1000,
+		// 	},
+		// },
 	] satisfies RtpCodecCapability[];
 
 	const worker = await mediasoup.createWorker({
@@ -115,7 +116,7 @@ async function runMediasoupServer() {
 				announcedAddress: '127.0.0.1', // Allows tab to tab communication
 				// ip: process.env.MEDIASOUP_LISTEN_IP || "0.0.0.0",
 				// announcedAddress: process.env.MEDIASOUP_ANNOUNCED_IP,
-				port: 44444,
+				port: 10000, // port inside the worker rtp port range, instead of 44444
 			},
 			{
 				protocol: 'tcp',
@@ -126,7 +127,7 @@ async function runMediasoupServer() {
 				// bjesuiter: Not providing abounded address should work if all clients can resolve the LAN IP of the Laptop.
 				// we only need that for clients outside of LAN or with NAT traversal
 				//announcedAddress: "192.168.204.244",
-				port: 44444,
+				port: 10000, // port inside the worker rtp port range, instead of 44444
 			},
 		],
 	});
