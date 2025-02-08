@@ -5,7 +5,9 @@
 	"scripts": {
 		"start": "docker compose up -d",
 		"stop": "docker compose down",
-		"restart": "bun stop && bun start"
+		"restart": "bun stop && bun start",
+		"logs": "docker compose logs -f",
+		"start-logs": "bun start && bun logs"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
