@@ -21,7 +21,7 @@ services:
       - '/var/run/docker.sock:/var/run/docker.sock:ro' # So that Traefik can listen to the Docker events (read only docker socket)
       - ./docker/traefik/config.yaml:/etc/traefik/traefik.yml # bind traefik config file from host
       - ./docker/traefik/file_configs:/etc/traefik/file_configs # bind traefik config file from host
-      - ./docker/traefik/cert_conf/acme.json:/acme.json # bind letsencrypt certificate storage file from host
+      - './docker/traefik/cert_conf/acme.json:/acme.json' # bind letsencrypt certificate storage file from host
       - ./docker/traefik/logs/access-logs:/access-logs # bind access.log file from host to save http accesses
       - ./docker/traefik/logs/traefik-logs:/traefik-logs # bind traefik.log file from host to save traefik server logs
     networks:
