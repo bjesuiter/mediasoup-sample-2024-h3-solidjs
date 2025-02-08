@@ -1,6 +1,7 @@
 import * as mediasoup from 'mediasoup';
 import type {RtpCodecCapability} from 'mediasoup/node/lib/types';
 import process from 'node:process';
+import {myLanIP} from '../utils/ip.ts';
 
 export const mediasoupServerPromise = runMediasoupServer();
 
@@ -114,7 +115,7 @@ async function runMediasoupServer() {
 				protocol: 'udp',
 				ip: '0.0.0.0',
 				// announcedAddress: '127.0.0.1', // Allows tab to tab communication
-				announcedAddress: '192.168.1.200', // Allows mobile to laptop communication - IF IP is correct!
+				announcedAddress: myLanIP, // Allows mobile to laptop communication - IF IP is correct!
 				// ip: process.env.MEDIASOUP_LISTEN_IP || "0.0.0.0",
 				// announcedAddress: process.env.MEDIASOUP_ANNOUNCED_IP,
 				port: 10000, // port inside the worker rtp port range, instead of 44444
@@ -123,7 +124,7 @@ async function runMediasoupServer() {
 				protocol: 'tcp',
 				ip: '0.0.0.0',
 				// announcedAddress: '127.0.0.1', // Allows tab to tab communication
-				announcedAddress: '192.168.1.200', // Allows mobile to laptop communication - IF IP is correct!
+				announcedAddress: myLanIP, // Allows mobile to laptop communication - IF IP is correct!
 				// ip: process.env.MEDIASOUP_LISTEN_IP || "0.0.0.0",
 				// announcedAddress: process.env.MEDIASOUP_ANNOUNCED_IP,
 				// bjesuiter: Not providing abounded address should work if all clients can resolve the LAN IP of the Laptop.
