@@ -1,4 +1,12 @@
+. {
+    forward . 1.1.1.1 9.9.9.9
+    reload 5s
+    log
+    errors
+}
+
 tagungsapps.de {
+    reload 5s
     file /zones/tagungsapps.de.zone
     log
     errors
