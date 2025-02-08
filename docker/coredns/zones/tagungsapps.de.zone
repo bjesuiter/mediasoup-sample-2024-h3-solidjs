@@ -1,6 +1,6 @@
 $TTL 120
 @   IN  SOA ns1.tagungsapps.de. admin.tagungsapps.de. (
-        2025020801 ; Serial
+        2025020802 ; Serial
         3600       ; Refresh
         1800       ; Retry
         1209600    ; Expire
@@ -8,9 +8,9 @@ $TTL 120
 )
     IN  NS  ns1.tagungsapps.de.
 
-ns1 IN  A   192.168.1.43  ; Replace with your DNS server's IP - Zephir Nighthawk
-@   IN  A   192.168.1.43  ; Replace with your domain's IP - Zephir Nighthawk
-translation IN A 192.168.1.43  ; Replace with the subdomain's IP- Zephir Nighthawk
-; ns1 IN  A   192.168.1.200  ; Replace with your DNS server's IP - Bruno Aula
-; @   IN  A   192.168.1.200  ; Replace with your domain's IP - Bruno Aula
-; translation IN A 192.168.1.200  ; Replace with the subdomain's IP - Bruno Aula
+; ns1         IN  A   192.168.1.43  ; Replace with your DNS server's IP - Zephir Nighthawk
+; @           IN  A   192.168.1.43  ; Replace with your domain's IP - Zephir Nighthawk
+; translation IN  A   192.168.1.43  ; Replace with the subdomain's IP- Zephir Nighthawk
+ns1           IN  A   192.168.1.200  ; Replace with your DNS server's IP - Bruno Aula
+@             IN  A   192.168.1.200  ; Replace with your domain's IP - Bruno Aula
+translation   IN  A 192.168.1.200  ; Replace with the subdomain's IP - Bruno Aula
