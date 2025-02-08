@@ -5,6 +5,7 @@
 	"scripts": {
 		"dev-old": "bunx listhen --ws -w index.ts",
 		"dev": "tsx watch server.ts",
+		"dev-deno": "deno run -A --unstable-sloppy-imports server.ts",
 		"express": "tsx watch server.ts",
 		"express-debug": "DEBUG=mediasoup* tsx watch server.ts",
 		"generate-self-signed-cert": "openssl req -x509 -newkey rsa:4096 -nodes -days 365 -keyout assets/dev_cert/key.pem -out assets/dev_cert/cert.pem"
