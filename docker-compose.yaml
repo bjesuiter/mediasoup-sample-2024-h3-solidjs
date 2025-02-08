@@ -57,3 +57,9 @@ services:
   #   restart: no
   #   # Test this dns server (Zephir Nighthawk) `dig @192.168.1.43 translation.tagungsapps.de`
   #   # Test this dns server (Bruno Aula) `dig @192.168.1.200 translation.tagungsapps.de`
+
+  client:
+    build:
+      context: ./packages/client
+      dockerfile: Dockerfile
+    restart: no

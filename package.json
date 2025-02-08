@@ -3,7 +3,7 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"start": "docker compose up -d --remove-orphans",
+		"start": "docker compose up -d --remove-orphans --build",
 		"stop": "docker compose down",
 		"restart": "bun stop && bun start",
 		"logs": "docker compose logs -f",
