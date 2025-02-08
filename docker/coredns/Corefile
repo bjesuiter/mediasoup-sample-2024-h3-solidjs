@@ -1,0 +1,5 @@
+tagungsapps.de {
+    file /zones/tagungsapps.de.zone
+    log
+    errors
+}
