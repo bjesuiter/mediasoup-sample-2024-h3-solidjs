@@ -45,14 +45,15 @@ services:
 
   dns:
     image: coredns/coredns:1.12.0
-    ports:
-      - '53:53/udp'
-      - '53:53/tcp'
+    network_mode: host
+    # ports:
+    #   - '53:53/udp'
+    #   - '53:53/tcp'
     volumes:
       - ./docker/coredns/Corefile:/Corefile
       # Test the zonefile with named-checkzone tagungsapps.de docker/coredns/zones/tagungsapps.de.zone
       # Test the zonefile with named-checkzone translation.tagungsapps.de docker/coredns/zones/tagungsapps.de.zone
       - ./docker/coredns/zones:/zones
-    restart: unless-stopped
+    restart: no
     # Test this dns server (Zephir Nighthawk) `dig @192.168.1.43 translation.tagungsapps.de`
     # Test this dns server (Bruno Aula) `dig @192.168.1.200 translation.tagungsapps.de`
