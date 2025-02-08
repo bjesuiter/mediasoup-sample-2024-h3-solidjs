@@ -81,14 +81,14 @@ entryPoints:
             sans:
               - '*.tagungsapps.de'
 
-  log:
-    level: DEBUG
-    filePath: '/traefik-logs'
-    format: common
+  # log:
+  #   level: DEBUG
+  #   filePath: '/traefik-logs'
+  #   format: common
 
-  accessLog:
-    filePath: '/access-logs'
-    format: 'common'
+  # accessLog:
+  #   filePath: '/access-logs'
+  #   format: 'common'
 
 tls:
   #   certificates:
