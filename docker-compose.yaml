@@ -63,3 +63,5 @@ services:
       context: ./packages/client
       dockerfile: Dockerfile
     restart: no
+    ports:
+      - '8000:8000'
