@@ -1,0 +1,44 @@
+# if not available: create it by docker network create traefik_ingress
+networks:
+  ingress:
+    name: traefik_ingress
+    external: true
+
+services:
+  # Reverse Proxy: traefik
+  traefik:
+    image: traefik:v2.11
+    restart: no
+    ports:
+      - '80:80' # The HTTP port
+      - '443:443' # The HTTPS port !
+      - '8082:8082' # The Ping Endpoint
+    environment:
+      # pass DODE_TOKEN into the container,
+      # to make it available to the traefik/acme-letsencrypt executable
+      - DODE_TOKEN=${TRAEFIK_DODE_TOKEN}
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock:ro' # So that Traefik can listen to the Docker events (read only docker socket)
+      - ./docker/traefik/config.yaml:/etc/traefik/traefik.yml # bind traefik config file from host
+      - ./docker/traefik/file_configs:/etc/traefik/file_configs # bind traefik config file from host
+      - ./docker/traefik/cert_conf/acme.json:/acme.json # bind letsencrypt certificate storage file from host
+      - ./docker/traefik/logs/access-logs:/access-logs # bind access.log file from host to save http accesses
+      - ./docker/traefik/logs/traefik-logs:/traefik-logs # bind traefik.log file from host to save traefik server logs
+    networks:
+      - ingress
+    labels:
+      - 'traefik.enable=true'
+      # The dashboard can be accessed on https://traefik.epyc.vserv.fun/dashboard/ for example
+      - 'traefik.http.routers.dashboard.rule=Host(`${SERVICE_DOMAIN}`, `traefik.${SERVICE_DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))'
+      - 'traefik.http.routers.dashboard.service=api@internal'
+      - 'traefik.http.routers.dashboard.entrypoints=https'
+      # Note: All SSL Settigns are done on the Entrypoint 'https'
+      # ------------------------
+      # Configure Auth Middleware
+      # The double dollars ('$$') in the password hash (in auth middleware)
+      # will be printed as 1 $ each in the final label.
+      # This avoids broken interpolation attempts by docker-compose
+      - 'traefik.http.middlewares.auth.basicauth.users=admin:$$2a$$12$$.Tipqm52SGBJK1WDJbOPCOGqNqVrybqafXlGWJSaWESFGgH1dnpNu'
+      # -------------------------------------------------
+      # Register Middlewares with router to activate them
+      - 'traefik.http.routers.dashboard.middlewares=auth'
