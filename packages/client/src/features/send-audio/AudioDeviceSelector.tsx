@@ -18,13 +18,19 @@ export function AudioDeviceSelector(props: {onDeviceSelected?: (stream?: MediaSt
 		queryKey: ['selectedAudioStream', selectedDeviceId()],
 		queryFn: async () => {
 			const constraints = {
-				audio:
-					!selectedDeviceId() || selectedDeviceId() === 'default'
-						? true
-						: {
-								deviceId: selectedDeviceId(),
-						  },
+				video: false, // No video
+				audio: {
+					deviceId: selectedDeviceId(),
+					sampleRate: 48000, // High sample rate
+					echoCancellation: false, // Disable echo cancellation for raw audio
+					noiseSuppression: false, // Disable noise suppression for raw audio
+					autoGainControl: false, // Disable auto gain control for raw audio
+				},
 			};
+
+			if (!selectedDeviceId() || selectedDeviceId() === 'default') {
+				delete constraints.audio.deviceId;
+			}
 
 			const userAudioMedia = await navigator.mediaDevices.getUserMedia(constraints);
 
