@@ -42,3 +42,6 @@ services:
       # -------------------------------------------------
       # Register Middlewares with router to activate them
       - 'traefik.http.routers.dashboard.middlewares=auth'
+
+  # dns:
+  #   image: coredns/coredns: 1.12.0
