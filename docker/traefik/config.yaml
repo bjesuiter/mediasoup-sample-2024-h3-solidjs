@@ -1,0 +1,121 @@
+---
+global:
+  checkNewVersion: false
+
+providers:
+  docker:
+    # Variable ansible_host will contain the direct host url / ip address from the ansible inventory (e.g. not the alias name)
+    # Since I do only use domains, it will be a domain every time.
+    # Idea:
+    # Each host, which has traefik on it, registeres it's docker containers under
+    # name-of-docker-container.ansible_host
+    # Example:
+    # hello-world.storage1500.vserv.fun
+    # How to customize this rule: https://doc.traefik.io/traefik/v2.0/providers/docker/#defaultrule
+    # NOTE: This variable {<ansible_host>} is defined by ansible and contains the host url of the current machine, like
+    # storage1500.vserv.fun
+    defaultRule: 'Host(`{{ trimPrefix `/` .Name }}.tagungsapps.de`)'
+    exposedByDefault: false
+
+  file:
+    directory: /etc/traefik/file_configs # Path is absolute inside the container (see docker-compose.yaml)
+    watch: true # CAUTION: Need a restart of traefik to apply changes!
+
+# Define certificate resolvers for auto-DNS
+certificatesResolvers:
+  domainoffensive:
+    acme:
+      email: bjesuiter@gmail.com
+      # Seems not to work - gets overwritten by the letsencrypt config below
+      storage: /acme.json
+      keyType: RSA4096
+
+      # Activate the following property to use the letsencrypt staging server to avoid rate limiting when experimenting
+      # Deactivate it for production.
+      # See here: https://doc.traefik.io/traefik/https/acme/#caserver
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+      # Default Production CA Server:
+      caServer: https://acme-v02.api.letsencrypt.org/directory
+
+      dnsChallenge:
+        # Config Docs: https://go-acme.github.io/lego/dns/dode/
+        # NOTE: All additional ENV Vars for this verification process
+        # are injected via doppler-cli (project: vserv-traefik)!
+        provider: dode
+        delayBeforeCheck: 0
+        resolvers:
+          - '1.1.1.1:53'
+          - '8.8.8.8:53'
+
+entryPoints:
+  http:
+    address: ':80'
+    # NOTE: This obstructs web challenge, since the acme service
+    # would be redirected to https, which does not work anymore.
+    # Not a problem for me, since I'm using DNS Challenge on http entrypoint
+    http:
+      redirections:
+        entrypoint:
+          to: https
+          scheme: https
+
+  https:
+    address: ':443'
+    # note: this http is not the http Entry point, but a specific key of the entryPoint configuration!
+    http:
+      tls:
+        certResolver: domainoffensive
+        domains:
+          - main: 'tagungsapps.de'
+            sans:
+              - '*.tagungsapps.de'
+
+  # @bjesuiter: if we need other ports than 80 or 443, we can define more entrypoints here
+  healthcheck:
+    address: ':8082'
+    http:
+      tls:
+        certResolver: domainoffensive
+        domains:
+          - main: 'tagungsapps.de'
+            sans:
+              - '*.tagungsapps.de'
+
+  log:
+    level: DEBUG
+    filePath: '/traefik-logs'
+    format: common
+
+  accessLog:
+    filePath: '/access-logs'
+    format: 'common'
+
+tls:
+  #   certificates:
+  #    - certFile: /path/to/domain.cert
+  #      keyFile: /path/to/domain.key
+  options:
+    default:
+      minVersion: VersionTLS12
+    mintls13:
+      minVersion: VersionTLS13
+#      cipherSuites:
+#         - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+#         - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+#         - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+#         - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+#         - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+
+# hardcoded services in this traefik_v2.yaml config file
+# (especially for interal traefik services)
+api:
+  dashboard: true
+  insecure: false
+  # service domain & paths & auth are configured dynamically in docker-compose.yaml of traefik
+
+# Docs for enabling ping service:
+# https://doc.traefik.io/traefik/operations/ping/
+# Address: http://host:8082/ping
+# IMPORTANT: use other entrypoint than https, otherwise ALL domains pointing to that server will have this ping endpoint!
+ping:
+  entryPoint: healthcheck
