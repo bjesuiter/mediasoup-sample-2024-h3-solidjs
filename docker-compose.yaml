@@ -1,7 +1,7 @@
 # if not available: create it by docker network create traefik_ingress
 networks:
   ingress:
-    name: traefik_ingress
+    name: ${TRAEFIK_NETWORK}
     external: true
 
 services:
@@ -65,3 +65,16 @@ services:
     restart: no
     ports:
       - '8000:8000'
+    networks:
+      - ingress
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=${TRAEFIK_NETWORK}'
+      - 'traefik.http.services.client.loadbalancer.server.port=8000'
+      - 'traefik.http.routers.client.rule=Host(`translate.tagungsapps.de`)'
+      - 'traefik.http.routers.client.service=client@docker'
+      - 'traefik.http.routers.client.entrypoints=https'
+
+      - 'traefik.http.routers.client.tls=true'
+      - 'traefik.http.routers.client.tls.certresolver=domainoffensive'
+      - 'traefik.http.routers.pihole.tls.domains[0].main=translate.tagungsapps.de'
