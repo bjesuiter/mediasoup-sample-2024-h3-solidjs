@@ -1,10 +1,9 @@
-# FROM ubuntu
-# COPY --from=denoland/deno:bin-2.1.9 /deno /usr/local/bin/deno
+FROM ubuntu:24.04
+COPY --from=denoland/deno:bin-2.1.9 /deno /usr/local/bin/deno
 
-# Use the official Deno image as the base image
-FROM denoland/deno:2.1.9
-
-USER deno
+# NOTE: this is suuuuper slow -> using a traefik file provider to the host machine instead
+RUN apt-get update 
+RUN apt-get install -y python3-pip 
 
 # Set the working directory
 WORKDIR /app

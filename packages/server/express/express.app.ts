@@ -10,7 +10,12 @@ export const expressApp = express();
 
 expressApp.use(
 	cors({
-		origin: ['http://localhost:8000', 'http://127.0.0.1:8000', 'http://' + myLanIP + ':8000'],
+		origin: [
+			'http://localhost:8000',
+			'http://127.0.0.1:8000',
+			'http://' + myLanIP + ':8000',
+			'https://translate.tagungsapps.de',
+		],
 		credentials: true,
 	})
 );
@@ -25,6 +30,10 @@ expressApp.use(
 		resave: false,
 	})
 );
+
+expressApp.use('/ping', (req, res) => {
+	res.send('pong');
+});
 
 expressApp.use(
 	'/trpc',

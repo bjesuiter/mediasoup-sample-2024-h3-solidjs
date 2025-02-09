@@ -1,0 +1,14 @@
+[http.services]
+[http.services.mediasoup-server.loadbalancer]
+[[http.services.mediasoup-server.loadbalancer.servers]]
+    url = "http://host.docker.internal:4000"
+
+[http.routers]
+[http.routers.mediasoup-server]
+    rule        = "Host(`translate-api.tagungsapps.de`)"
+    service     = "mediasoup-server"
+    entryPoints = ["https"]
+[http.routers.mediasoup-server.tls]
+    certResolver = "domainoffensive"
+[[http.routers.mediasoup-server.tls.domains]]
+    main = "translate-api.tagungsapps.de"
