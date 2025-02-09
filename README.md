@@ -19,3 +19,16 @@
    2. traefik.tagungsapps.de => 192.168.8.8
    3. translate.tagungsapps.de => 192.168.8.8
    4. translate-api.tagungsapps.de => 192.168.8.8
+4. Start the dev setup
+
+   1. Run `bun start-logs` or similar from the root package.json
+      => starts the traefik reverse proxy (for https certs)
+   2. Run `bun dev` in /packages/server
+      => starts the server on https://translate-api.tagungsapps.de (internally localhost:4000)
+   3. Run `bun dev` in /packages/client
+      => starts the client on https://translate.tagungsapps.de (internally localhost:8000)
+
+5. Set the default input to "Hijack Audio" (to avoid isses in audio device selection)
+6. Open https://translate.tagungsapps.de/send-trpc on your Laptop
+7. Open https://translate.tagungsapps.de/receive-trpc on your Phone
+8. enjoy!
