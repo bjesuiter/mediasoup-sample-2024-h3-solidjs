@@ -4,7 +4,8 @@
 	"description": "",
 	"scripts": {
 		"start": "vite",
-		"dev": "vite --port 8000 --host",
+		"dev": "vite --mode localhost",
+		"dev-lan": "vite --host --mode lan",
 		"build": "vite build",
 		"serve": "vite preview"
 	},

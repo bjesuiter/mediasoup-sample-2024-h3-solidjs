@@ -12,7 +12,7 @@ export default defineConfig({
 		solidPlugin(),
 	],
 	server: {
-		port: 3000,
+		port: 8000,
 		allowedHosts: ['translate.tagungsapps.de'],
 	},
 	build: {
