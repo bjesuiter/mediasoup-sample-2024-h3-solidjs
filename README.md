@@ -32,3 +32,6 @@
 6. Open https://translate.tagungsapps.de/send-trpc on your Laptop
 7. Open https://translate.tagungsapps.de/receive-trpc on your Phone
 8. enjoy!
+
+If no connction to the virtual hosts translate.tagungsapps.de:
+Flush Cache: `sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder`
