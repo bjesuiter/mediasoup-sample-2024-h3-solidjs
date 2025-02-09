@@ -31,6 +31,8 @@ expressApp.use(
 	})
 );
 
+// test with
+// https://translate-api.tagungsapps.de/ping
 expressApp.use('/ping', (req, res) => {
 	res.send('pong');
 });
