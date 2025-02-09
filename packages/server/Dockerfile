@@ -1,3 +1,6 @@
+# FROM ubuntu
+# COPY --from=denoland/deno:bin-2.1.9 /deno /usr/local/bin/deno
+
 # Use the official Deno image as the base image
 FROM denoland/deno:2.1.9
 
