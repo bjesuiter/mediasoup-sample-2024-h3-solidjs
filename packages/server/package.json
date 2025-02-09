@@ -3,9 +3,10 @@
 	"module": "server.ts",
 	"type": "module",
 	"scripts": {
-		"dev": "deno run -A --watch --unstable-sloppy-imports server.ts",
-		"dev-debug": "DEBUG=mediasoup* deno run -A --watch --unstable-sloppy-imports server.ts",
-		"generate-self-signed-cert": "openssl req -x509 -newkey rsa:4096 -nodes -days 365 -keyout assets/dev_cert/key.pem -out assets/dev_cert/cert.pem"
+		"dev": "OTEL_DENO=true deno run -A --watch --unstable-sloppy-imports --unstable-otel server.ts",
+		"dev-debug": "DEBUG=mediasoup* OTEL_DENO=true deno run -A --watch --unstable-sloppy-imports --unstable-otel server.ts",
+		"generate-self-signed-cert": "openssl req -x509 -newkey rsa:4096 -nodes -days 365 -keyout assets/dev_cert/key.pem -out assets/dev_cert/cert.pem",
+		"metrics": "./scripts/metrics.sh"
 	},
 	"devDependencies": {
 		"@types/bun": "latest"
