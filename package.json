@@ -20,9 +20,7 @@
 	"workspaces": [
 		"packages/*"
 	],
-	"dependencies": {
-		"@trpc/server": "^10.45.2"
-	},
+	"dependencies": {},
 	"trustedDependencies": [
 		"esbuild",
 		"nx"

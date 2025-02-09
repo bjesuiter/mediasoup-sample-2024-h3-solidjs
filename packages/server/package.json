@@ -17,6 +17,7 @@
 		"typescript": "^5.7.3"
 	},
 	"dependencies": {
+		"@trpc/server": "^10.45.2",
 		"@types/cookie": "^1.0.0",
 		"@types/cors": "^2.8.17",
 		"@types/express": "^4.17.21",
