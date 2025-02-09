@@ -58,28 +58,28 @@ services:
   #   # Test this dns server (Zephir Nighthawk) `dig @192.168.1.43 translation.tagungsapps.de`
   #   # Test this dns server (Bruno Aula) `dig @192.168.1.200 translation.tagungsapps.de`
 
-  client:
-    build:
-      context: ./packages/client
-      dockerfile: Dockerfile
-    restart: no
-    ports:
-      - '8000:8000'
-    networks:
-      - ingress
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.docker.network=${TRAEFIK_NETWORK}'
-      - 'traefik.http.services.client.loadbalancer.server.port=8000'
-      - 'traefik.http.routers.client.rule=Host(`translate.tagungsapps.de`)'
-      - 'traefik.http.routers.client.service=client@docker'
-      - 'traefik.http.routers.client.entrypoints=https'
+  # translate-client:
+  #   build:
+  #     context: ./packages/client
+  #     dockerfile: Dockerfile
+  #   restart: no
+  #   ports:
+  #     - '8000:8000'
+  #   networks:
+  #     - ingress
+  #   labels:
+  #     - 'traefik.enable=true'
+  #     - 'traefik.docker.network=${TRAEFIK_NETWORK}'
+  #     - 'traefik.http.services.client.loadbalancer.server.port=8000'
+  #     - 'traefik.http.routers.client.rule=Host(`translate.tagungsapps.de`)'
+  #     - 'traefik.http.routers.client.service=client@docker'
+  #     - 'traefik.http.routers.client.entrypoints=https'
 
-      - 'traefik.http.routers.client.tls=true'
-      - 'traefik.http.routers.client.tls.certresolver=domainoffensive'
-      - 'traefik.http.routers.client.tls.domains[0].main=translate.tagungsapps.de'
+  #     - 'traefik.http.routers.client.tls=true'
+  #     - 'traefik.http.routers.client.tls.certresolver=domainoffensive'
+  #     - 'traefik.http.routers.client.tls.domains[0].main=translate.tagungsapps.de'
 
-  # server:
+  # translate-server:
   #   build:
   #     context: ./packages/server
   #     dockerfile: Dockerfile
