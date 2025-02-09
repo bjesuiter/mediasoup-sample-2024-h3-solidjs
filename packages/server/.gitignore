@@ -13,6 +13,8 @@ lerna-debug.log*
 # the folder for the open telemetry mini stack
 lgtm 
 
+.env*.local
+
 # Caches
 
 .cache
