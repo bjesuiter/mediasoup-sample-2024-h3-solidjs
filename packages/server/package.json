@@ -24,8 +24,7 @@
 		"express": "^4.21.2",
 		"express-session": "^1.18.0",
 		"mediasoup": "^3.15.3",
-		"tslog": "^4.9.2",
-		"tsx": "^4.9.1"
+		"tslog": "^4.9.2"
 	},
 	"trustedDependencies": [
 		"mediasoup"

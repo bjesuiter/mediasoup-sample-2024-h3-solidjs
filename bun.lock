@@ -45,7 +45,6 @@
         "express-session": "^1.18.0",
         "mediasoup": "^3.15.3",
         "tslog": "^4.9.2",
-        "tsx": "^4.9.1",
       },
       "devDependencies": {
         "@types/bun": "latest",
