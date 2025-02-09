@@ -8,7 +8,8 @@
 		"restart": "bun stop && bun start",
 		"logs": "docker compose logs -f",
 		"start-logs": "bun start && bun logs",
-		"restart-logs": "bun restart && bun logs"
+		"restart-logs": "bun restart && bun logs",
+		"flush-cache": "sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
