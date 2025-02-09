@@ -1747,6 +1747,7 @@
             "npm:express-session@^1.18.0",
             "npm:express@^4.21.2",
             "npm:mediasoup@^3.15.3",
+            "npm:open@^10.1.0",
             "npm:tslog@^4.9.2"
           ]
         }

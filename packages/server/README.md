@@ -14,7 +14,7 @@ Instructions: https://docs.deno.com/runtime/fundamentals/open_telemetry/#quick-s
 
 1. Run `bun metrics` to start the simple LGTM stack with docker (remember to start orbstack or docker runtime)
 2. Run `bun dev` to start the server
-3. Open
+3. You can then access the Grafana dashboard at http://localhost:3000 with the username admin and password admin.
 
 ## How to write custom metrics for the open telemetry stack
 

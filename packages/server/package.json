@@ -6,10 +6,12 @@
 		"dev": "OTEL_DENO=true deno run -A --watch --unstable-sloppy-imports --unstable-otel server.ts",
 		"dev-debug": "DEBUG=mediasoup* OTEL_DENO=true deno run -A --watch --unstable-sloppy-imports --unstable-otel server.ts",
 		"generate-self-signed-cert": "openssl req -x509 -newkey rsa:4096 -nodes -days 365 -keyout assets/dev_cert/key.pem -out assets/dev_cert/cert.pem",
-		"metrics": "./scripts/metrics.sh"
+		"metrics": "./scripts/metrics.sh",
+		"open-metrics": "open http://localhost:3000"
 	},
 	"devDependencies": {
-		"@types/bun": "latest"
+		"@types/bun": "latest",
+		"open": "^10.1.0"
 	},
 	"peerDependencies": {
 		"typescript": "^5.7.3"
