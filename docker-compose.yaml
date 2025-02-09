@@ -77,4 +77,25 @@ services:
 
       - 'traefik.http.routers.client.tls=true'
       - 'traefik.http.routers.client.tls.certresolver=domainoffensive'
-      - 'traefik.http.routers.pihole.tls.domains[0].main=translate.tagungsapps.de'
+      - 'traefik.http.routers.client.tls.domains[0].main=translate.tagungsapps.de'
+
+  server:
+    build:
+      context: ./packages/server
+      dockerfile: Dockerfile
+    restart: no
+    ports:
+      - '4000:4000'
+    networks:
+      - ingress
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=${TRAEFIK_NETWORK}'
+      - 'traefik.http.services.server.loadbalancer.server.port=4000'
+      - 'traefik.http.routers.server.rule=Host(`translate-api.tagungsapps.de`)'
+      - 'traefik.http.routers.server.service=server@docker'
+      - 'traefik.http.routers.server.entrypoints=https'
+
+      - 'traefik.http.routers.server.tls=true'
+      - 'traefik.http.routers.server.tls.certresolver=domainoffensive'
+      - 'traefik.http.routers.server.tls.domains[0].main=translate-api.tagungsapps.de'
