@@ -1,0 +1,14 @@
+[http.services]
+[http.services.translate-client.loadbalancer]
+[[http.services.translate-client.loadbalancer.servers]]
+    url = "http://host.docker.internal:8000"
+
+[http.routers]
+[http.routers.translate-client]
+    rule        = "Host(`translate.tagungsapps.de`)"
+    service     = "translate-client"
+    entryPoints = ["https"]
+[http.routers.translate-client.tls]
+    certResolver = "domainoffensive"
+[[http.routers.translate-client.tls.domains]]
+    main = "translate.tagungsapps.de"
