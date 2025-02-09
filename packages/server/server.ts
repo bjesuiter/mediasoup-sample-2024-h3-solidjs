@@ -1,5 +1,5 @@
-import {expressApp} from './express/express.app';
-import {logger} from './utils/logger';
+import {expressApp} from './express/express.app.ts';
+import {logger} from './utils/logger.ts';
 import './utils/ip.ts';
 
 const expressPort = 4000;
