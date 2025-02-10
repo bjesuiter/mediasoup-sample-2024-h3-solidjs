@@ -1789,6 +1789,7 @@
       "packages/server": {
         "packageJson": {
           "dependencies": [
+            "npm:@dotenvx/dotenvx@^1.35.0",
             "npm:@trpc/server@^10.45.2",
             "npm:@types/bun@latest",
             "npm:@types/cookie@1",

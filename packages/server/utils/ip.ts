@@ -12,6 +12,5 @@ const en0IPv4 = en0.find(networkInterface => networkInterface.family === 'IPv4')
 if (!en0IPv4 || !en0IPv4.address) {
 	throw new Error('No IPv4 address found for the en0 interface!');
 }
-console.log(`Local IP address: ${en0IPv4.address}`);
 
 export const myLanIP = en0IPv4.address;
