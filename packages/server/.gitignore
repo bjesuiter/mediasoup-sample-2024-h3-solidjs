@@ -13,10 +13,11 @@ lerna-debug.log*
 # the folder for the open telemetry mini stack
 lgtm 
 
-.env/
 .env
 .env.*
 !.env.schema
+!.env/
+!.env/*.env
 .env*.local
 
 # Caches
@@ -182,3 +183,7 @@ dist
 
 # Finder (MacOS) folder config
 .DS_Store
+
+# Commit checked-in Varlock server profiles.
+!.env/
+!.env/*.env
