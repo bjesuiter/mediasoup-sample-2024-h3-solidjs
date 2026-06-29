@@ -3,3 +3,5 @@ dist
 .env
 .env.*
 !.env.schema
+!.env.lan.local
+!.env.localhost.local
