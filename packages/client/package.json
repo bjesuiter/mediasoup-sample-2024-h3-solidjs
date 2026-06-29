@@ -3,11 +3,11 @@
 	"version": "0.0.0",
 	"description": "",
 	"scripts": {
-		"start": "vite",
-		"dev": "vite --mode localhost",
-		"dev-lan": "vite --host --mode lan",
-		"build": "vite build",
-		"serve": "vite preview"
+		"start": "varlock run -- vite",
+		"dev": "varlock run -p .env.localhost.local -- vite --mode localhost",
+		"dev-lan": "varlock run -p .env.lan.local -- vite --host --mode lan",
+		"build": "varlock run -- vite build",
+		"serve": "varlock run -- vite preview"
 	},
 	"license": "MIT",
 	"dependencies": {

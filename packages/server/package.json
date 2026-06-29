@@ -3,15 +3,14 @@
 	"module": "server.ts",
 	"type": "module",
 	"scripts": {
-		"dev": "dotenvx run -f .env/localhost.env -- deno run -A --watch --unstable-sloppy-imports --unstable-otel server.ts",
-		"dev-debug": "dotenvx run -f .env/localhost.debug.env -- deno run -A --watch --unstable-sloppy-imports --unstable-otel server.ts",
-		"dev-lan": "dotenvx run -f .env/lan.env -- deno run -A --watch --unstable-sloppy-imports --unstable-otel server.ts",
+		"dev": "varlock run -p .env/localhost.env -- deno run -A --watch --unstable-sloppy-imports --unstable-otel server.ts",
+		"dev-debug": "varlock run -p .env/localhost.debug.env -- deno run -A --watch --unstable-sloppy-imports --unstable-otel server.ts",
+		"dev-lan": "varlock run -p .env/lan.env -- deno run -A --watch --unstable-sloppy-imports --unstable-otel server.ts",
 		"generate-self-signed-cert": "openssl req -x509 -newkey rsa:4096 -nodes -days 365 -keyout assets/dev_cert/key.pem -out assets/dev_cert/cert.pem",
 		"metrics": "./scripts/metrics.sh",
 		"open-metrics": "open http://localhost:3000"
 	},
 	"devDependencies": {
-		"@dotenvx/dotenvx": "^1.35.0",
 		"@types/bun": "latest",
 		"open": "^10.1.0"
 	},

@@ -3,17 +3,18 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"start": "docker compose up -d --remove-orphans --build",
-		"stop": "docker compose down",
+		"start": "DEV_ENV=jb varlock run -- docker compose up -d --remove-orphans --build",
+		"stop": "DEV_ENV=jb varlock run -- docker compose down",
 		"restart": "bun stop && bun start",
-		"logs": "docker compose logs -f",
+		"logs": "DEV_ENV=jb varlock run -- docker compose logs -f",
 		"start-logs": "bun start && bun logs",
 		"restart-logs": "bun restart && bun logs",
 		"flush-cache": "sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
-		"typescript": "^5.7.3"
+		"typescript": "^5.7.3",
+		"varlock": "^1.9.0"
 	},
 	"peerDependencies": {
 		"typescript": "^5.7.3"

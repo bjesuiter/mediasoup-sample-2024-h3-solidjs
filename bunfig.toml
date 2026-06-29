@@ -1,3 +1,5 @@
+env = false
+
 [install.scopes]
     "@jsr" = "https://npm.jsr.io"
 
